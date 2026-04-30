@@ -1,0 +1,8 @@
+#ignorons l'environnement virtuel et les dépendances spécifiques à ce projet
+venv
+/venv
+venv/
+__pycache__/
+*.pyc
+.env
+db.sqlite3

@@ -255,8 +255,9 @@ Ce projet est sous licence personnalisée. Voir le fichier [license](license) po
 *Développeur Full Stack & Créateur de solutions modernes*
 
 [![GitHub](https://img.shields.io/badge/GitHub-MORELDEV237-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MORELDEV237)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-MORELDEV237-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/moreldev237)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-MORELDEV237-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/morel-nkonga-5617a32a8/)
 [![Email](https://img.shields.io/badge/Email-moreldev237@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:moreldev237@gmail.com)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-Chat-green?style=flat&logo=whatsapp)](https://wa.me/+237686865451)
 
 </div>
 
