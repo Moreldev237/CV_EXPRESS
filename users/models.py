@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -40,3 +41,26 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class OTP(models.Model):
+    """
+    Modèle pour stocker les codes OTP (One-Time Password) pour la vérification de l'utilisateur.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otps')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_verified = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _('OTP')
+        verbose_name_plural = _('OTPs')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"OTP pour {self.user.email}"
+
+    @property
+    def is_expired(self):
+        return timezone.now() >= self.expires_at

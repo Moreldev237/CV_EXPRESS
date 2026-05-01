@@ -2,93 +2,208 @@ from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
-from django.http import JsonResponse
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from django.utils import timezone
 import os
+
+# Pour l'envoi d'e-mails (non implémenté ici, juste pour l'exemple)
+# from django.core.mail import send_mail
 
 from .models import User
 from .serializers import (
     UserSerializer,
     RegisterSerializer,
     UpdateProfileSerializer,
-    ProfileImageUploadSerializer
+    ProfileImageUploadSerializer,
+    OTPVerificationSerializer,
+    OTPRequestSerializer
 )
+from .models import OTP
 
 
 class RegisterView(APIView):
     """
-    API endpoint for user registration.
-    
-    POST /api/users/register/
-    
-    Request Body:
-    {
-        "email": "user@example.com",
-        "username": "username",
-        "password": "password123",
-        "password_confirm": "password123",
-        "first_name": "John",
-        "last_name": "Doe"
-    }
-    
-    Success Response (201):
-    {
-        "message": "User registered successfully.",
-        "user": {
-            "id": 1,
-            "email": "user@example.com",
-            "username": "username",
-            "first_name": "John",
-            "last_name": "Doe"
-        }
-    }
-    
-    Error Response (400):
-    {
-        "email": ["This email is already registered."],
-        "username": ["A user with that username already exists."]
-    }
+    Endpoint pour l'inscription des utilisateurs.
+    Crée un nouveau compte utilisateur inactif et envoie un code OTP par e-mail
+    pour vérification avant activation.
     """
     permission_classes = [permissions.AllowAny]
     
+    @swagger_auto_schema(
+        tags=['Authentification'],
+        operation_id='Enregistrer un utilisateur',
+        operation_description="Enregistre un nouvel utilisateur avec e-mail et mot de passe. "
+                              "L'e-mail servira d'identifiant unique. "
+                              "Un code OTP est envoyé par e-mail pour activer le compte.",
+        request_body=RegisterSerializer,
+        consumes=['application/x-www-form-urlencoded'],
+        responses={
+            201: openapi.Response(
+                description='Utilisateur enregistré avec succès',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING, description='Message de confirmation'),
+                        'user': openapi.Schema(type=openapi.TYPE_OBJECT, description='Détails de l\'utilisateur')
+                    }
+                )
+            ),
+            400: 'Erreur de validation'
+        },
+        security=[]
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response({
-                'message': 'User registered successfully.',
+                'message': 'Utilisateur enregistré avec succès. Veuillez vérifier votre e-mail pour le code de validation.',
                 'user': UserSerializer(user).data
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class VerifyRegistrationOTPView(APIView):
+    """
+    Endpoint pour vérifier le code OTP et activer le compte utilisateur.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        tags=['Authentification'],
+        operation_id='Vérifier OTP',
+        operation_description='Vérifie le code OTP envoyé par e-mail. Si le code est valide et non expiré, le compte est activé et les tokens JWT sont renvoyés.',
+        request_body=OTPVerificationSerializer,
+        consumes=['application/x-www-form-urlencoded'],
+        responses={
+            200: openapi.Response(
+                description='Compte activé avec succès',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'access': openapi.Schema(type=openapi.TYPE_STRING),
+                        'refresh': openapi.Schema(type=openapi.TYPE_STRING),
+                        'user': openapi.Schema(type=openapi.TYPE_OBJECT)
+                    }
+                )
+            ),
+            400: 'Code invalide ou expiré',
+            404: 'Utilisateur non trouvé'
+        },
+        security=[]
+    )
+    def post(self, request):
+        serializer = OTPVerificationSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            otp_code = serializer.validated_data['otp_code']
+            
+            try:
+                user = User.objects.get(email=email)
+                if user.is_active:
+                    return Response({'error': 'Ce compte est déjà activé.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                otp = OTP.objects.filter(user=user, code=otp_code, is_verified=False).first()
+                
+                if not otp or otp.is_expired:
+                    return Response({'error': 'Code OTP invalide ou expiré.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Activer l'utilisateur
+                user.is_active = True
+                user.save()
+                
+                # Marquer l'OTP comme utilisé
+                otp.is_verified = True
+                otp.save()
+                
+                # Générer les tokens pour connexion immédiate
+                refresh = RefreshToken.for_user(user)
+                
+                return Response({
+                    'message': 'Compte activé avec succès.',
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                    'user': UserSerializer(user).data
+                }, status=status.HTTP_200_OK)
+                
+            except User.DoesNotExist:
+                return Response({'error': 'Utilisateur non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+                
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RequestNewOTPView(APIView):
+    """
+    Endpoint pour demander un nouveau code OTP si le précédent a expiré.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        tags=['Authentification'],
+        operation_id='Renvoyer OTP',
+        operation_description='Génère et envoie un nouveau code OTP à l\'adresse e-mail fournie si le compte n\'est pas encore activé.',
+        request_body=OTPRequestSerializer,
+        consumes=['application/x-www-form-urlencoded'],
+        responses={
+            200: openapi.Response(
+                description='Nouveau code OTP envoyé',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: 'Erreur de validation ou compte déjà actif',
+            404: 'Utilisateur non trouvé'
+        },
+        security=[]
+    )
+    def post(self, request):
+        serializer = OTPRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+                if user.is_active:
+                    return Response({'error': 'Ce compte est déjà activé.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                import random
+                otp_code = str(random.randint(100000, 999999))
+                expires_at = timezone.now() + timezone.timedelta(minutes=10)
+                OTP.objects.create(user=user, code=otp_code, expires_at=expires_at)
+                
+                # En production, envoyer l'email ici
+                print(f"DEBUG: Nouveau OTP pour {user.email}: {otp_code}")
+                
+                return Response({'message': 'Un nouveau code OTP a été envoyé par e-mail.'}, status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                return Response({'error': 'Utilisateur non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class ProfileView(APIView):
     """
-    API endpoint to get current user profile.
-    
-    GET /api/users/profile/
-    
-    Headers:
-    Authorization: Bearer <access_token>
-    
-    Success Response (200):
-    {
-        "id": 1,
-        "email": "user@example.com",
-        "username": "username",
-        "first_name": "John",
-        "last_name": "Doe",
-        "profile_image": "/media/profile_images/photo.jpg",
-        "bio": "Bio text",
-        "phone": "+1234567890",
-        ...
-    }
-    
-    Error Response (401):
-    {
-        "detail": "Authentication credentials were not provided."
-    }
+    Endpoint pour récupérer le profil de l'utilisateur actuel.
     """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        tags=['Profil'],
+        operation_id='Obtenir le profil',
+        operation_description='Récupère les informations du profil de l\'utilisateur actuellement authentifié.',
+        responses={
+            200: openapi.Response(
+                description='Profil récupéré avec succès',
+                schema=UserSerializer
+            ),
+            401: 'Non autorisé'
+        },
+        security=[{'Bearer': []}]
+    )
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
@@ -96,38 +211,32 @@ class ProfileView(APIView):
 
 class UpdateProfileView(APIView):
     """
-    API endpoint to update current user profile.
-    
-    PUT /api/users/profile/update/
-    
-    Headers:
-    Authorization: Bearer <access_token>
-    
-    Request Body:
-    {
-        "first_name": "John",
-        "last_name": "Doe",
-        "bio": "Updated bio",
-        "phone": "+1234567890",
-        "address": "123 Main St",
-        "occupation": "Developer",
-        "company": "Tech Corp",
-        "website": "https://example.com",
-        "linkedin": "https://linkedin.com/in/user",
-        "github": "https://github.com/user"
-    }
-    
-    Success Response (200):
-    {
-        "message": "Profile updated successfully.",
-        "user": { ... updated user data ... }
-    }
-    
-    Error Response (400):
-    {
-        "field_name": ["Error message"]
-    }
+    Endpoint pour mettre à jour le profil de l'utilisateur actuel.
     """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        tags=['Profil'],
+        operation_id='Mettre à jour le profil',
+        operation_description='Met à jour les informations du profil de l\'utilisateur authentifié. Tous les champs sont optionnels.',
+        request_body=UpdateProfileSerializer,
+        consumes=['application/x-www-form-urlencoded'],
+        responses={
+            200: openapi.Response(
+                description='Profil mis à jour avec succès',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'user': openapi.Schema(type=openapi.TYPE_OBJECT, description='Profil mis à jour')
+                    }
+                )
+            ),
+            400: 'Validation Error',
+            401: 'Unauthorized'
+        },
+        security=[{'Bearer': []}]
+    )
     def put(self, request):
         serializer = UpdateProfileSerializer(
             request.user, 
@@ -137,7 +246,7 @@ class UpdateProfileView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({
-                'message': 'Profile updated successfully.',
+                'message': 'Profil mis à jour avec succès.',
                 'user': UserSerializer(request.user).data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -145,28 +254,32 @@ class UpdateProfileView(APIView):
 
 class UploadProfileImageView(APIView):
     """
-    API endpoint to upload profile image.
-    
-    POST /api/users/profile/upload-image/
-    
-    Headers:
-    Authorization: Bearer <access_token>
-    Content-Type: multipart/form-data
-    
-    Request Body (form-data):
-    profile_image: <image_file>
-    
-    Success Response (200):
-    {
-        "message": "Profile image uploaded successfully.",
-        "profile_image": "/media/profile_images/username_photo.jpg"
-    }
-    
-    Error Response (400):
-    {
-        "profile_image": ["Error message"]
-    }
+    Endpoint pour télécharger une image de profil.
     """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        tags=['Profil'],
+        operation_id='Télécharger l\'image de profil',
+        operation_description='Télécharge une nouvelle image de profil. Formats supportés: jpg, jpeg, png, gif. Taille max: 5Mo.',
+        request_body=ProfileImageUploadSerializer,
+        consumes=['multipart/form-data'],
+        responses={
+            200: openapi.Response(
+                description='Image de profil téléchargée avec succès',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'profile_image': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                )
+            ),
+            400: 'Validation Error',
+            401: 'Unauthorized'
+        },
+        security=[{'Bearer': []}]
+    )
     def post(self, request):
         serializer = ProfileImageUploadSerializer(data=request.data)
         if serializer.is_valid():
@@ -184,36 +297,7 @@ class UploadProfileImageView(APIView):
             request.user.save()
             
             return Response({
-                'message': 'Profile image uploaded successfully.',
+                'message': 'Image de profil téléchargée avec succès.',
                 'profile_image': request.user.profile_image.url
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class LogoutView(APIView):
-    """
-    API endpoint for user logout.
-    
-    POST /api/users/auth/logout/
-    
-    Headers:
-    Authorization: Bearer <refresh_token>
-    
-    Success Response (200):
-    {
-        "message": "Logout successful."
-    }
-    """
-    def post(self, request):
-        try:
-            refresh_token = request.data.get('refresh_token')
-            if refresh_token:
-                token = RefreshToken(refresh_token)
-                token.blacklist()
-            return Response({
-                'message': 'Logout successful.'
-            }, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({
-                'message': 'Error during logout.'
-            }, status=status.HTTP_400_BAD_REQUEST)

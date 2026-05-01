@@ -178,6 +178,8 @@ CV_EXPRESS/
 | Endpoint | Méthode | Description |
 |----------|--------|-------------|
 | `/api/auth/register/` | POST | Inscription |
+| `/api/auth/verify-otp/` | POST | Vérification OTP |
+| `/api/auth/resend-otp/` | POST | Renvoyer code OTP |
 | `/api/auth/login/` | POST | Connexion |
 | `/api/auth/refresh/` | POST | Rafraîchir token |
 | `/api/auth/logout/` | POST | Déconnexion |

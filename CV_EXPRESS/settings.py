@@ -1,4 +1,3 @@
-
 import drf_yasg
 import os
 from datetime import timedelta
@@ -17,7 +16,7 @@ SECRET_KEY = 'django-insecure-o(y4v1n11(0t=9#b750$dqi0g8yo=3jal-gd7y!+2e!)t-mcd8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -160,12 +159,6 @@ SWAGGER_SETTINGS = {
             'name': 'Authorization',
             'in': 'header',
             'description': 'JWT authorization header using the Bearer scheme. Example: "Bearer {token}"'
-        },
-        'Basic': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'Basic authentication header. Example: "Basic {credentials}"'
         }
     },
     'VALIDATOR_URL': None,
@@ -180,13 +173,6 @@ SWAGGER_SETTINGS = {
             }
         }
     ],
-    'OPERATIONS_INFO': {
-        'get': 'Retrieve API information',
-        'post': 'Create a resource',
-        'put': 'Update a resource',
-        'patch': 'Partially update a resource',
-        'delete': 'Delete a resource'
-    }
 }
 
 # OpenAPI Settings

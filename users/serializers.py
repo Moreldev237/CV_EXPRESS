@@ -1,20 +1,48 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, OTP
+import random
+from django.utils import timezone
 
 
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for User model - Read operations
     """
+    full_name = serializers.SerializerMethodField()
+    completion_percentage = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'first_name', 'last_name',
+            'id', 'username', 'email', 'first_name', 'last_name', 'full_name',
             'profile_image', 'bio', 'phone', 'address', 'date_of_birth',
             'occupation', 'company', 'website', 'linkedin', 'github',
-            'created_at', 'updated_at'
+            'completion_percentage', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}".strip() or obj.username
+
+    def get_completion_percentage(self, obj):
+        """
+        Calcule le pourcentage de complétion du profil basé sur les champs importants.
+        """
+        fields_to_check = [
+            'first_name', 'last_name', 'profile_image', 'bio', 
+            'phone', 'address', 'occupation', 'linkedin'
+        ]
+        if not fields_to_check:
+            return 0
+        
+        filled_fields = 0
+        for field in fields_to_check:
+            value = getattr(obj, field)
+            if value and value != 'default_profile.png':
+                filled_fields += 1
+        
+        percentage = (filled_fields / len(fields_to_check)) * 100
+        return round(percentage, 2)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -27,8 +55,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'email', 'username', 'password', 'password_confirm',
-            'first_name', 'last_name'
+            'first_name', 'last_name', 'email', 
+            'password', 'password_confirm'
         ]
 
     def validate(self, attrs):
@@ -37,8 +65,36 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        # Par défaut, le compte est inactif jusqu'à la vérification OTP
         validated_data.pop('password_confirm')
-        user = User.objects.create_user(**validated_data)
+        email = validated_data.get('email')
+        password = validated_data.pop('password')
+
+        # On utilise l'email comme username car Django (AbstractUser) nécessite un username unique
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            is_active=False,
+            **validated_data
+        )
+
+        # Générer et enregistrer l'OTP
+        otp_code = str(random.randint(100000, 999999))
+        # L'OTP expire après 10 minutes
+        expires_at = timezone.now() + timezone.timedelta(minutes=10)
+        OTP.objects.create(user=user, code=otp_code, expires_at=expires_at)
+
+        # TODO: Envoyer l'OTP par e-mail
+        # send_mail(
+        #     'Votre code de vérification CV_EXPRESS',
+        #     f'Bonjour {user.username},\n\nVotre code de vérification est : {otp_code}\n\nCe code expirera dans 10 minutes.',
+        #     'noreply@cvexpress.com',
+        #     [user.email],
+        #     fail_silently=False,
+        # )
+        print(f"DEBUG: OTP for {user.email}: {otp_code}") # À supprimer en production
+        
         return user
 
 
@@ -72,3 +128,18 @@ class ProfileImageUploadSerializer(serializers.Serializer):
             raise serializers.ValidationError('Unsupported file extension.')
         
         return value
+
+
+class OTPVerificationSerializer(serializers.Serializer):
+    """
+    Serializer pour la vérification du code OTP.
+    """
+    email = serializers.EmailField()
+    otp_code = serializers.CharField(max_length=6)
+
+
+class OTPRequestSerializer(serializers.Serializer):
+    """
+    Serializer pour demander un nouveau code OTP.
+    """
+    email = serializers.EmailField()

@@ -10,11 +10,11 @@ from drf_yasg.views import get_schema_view
 # Schema view for Swagger/OpenAPI documentation
 schema_view = get_schema_view(
     openapi.Info(
-        title="CV Express API",
+        title="API CV Express",
         default_version="v1",
-        description="API for CV Express application. Provides endpoints for user registration, authentication (JWT), profile management, and profile image uploads.",
+        description="API pour l'application CV Express. Fournit des endpoints pour l'inscription, l'authentification (JWT), la gestion du profil et le téléchargement d'images.",
         terms_of_service="https://example.com/terms/",
-        contact=openapi.Contact(name="API Support", email="support@cvexpress.com"),
+        contact=openapi.Contact(name="Support API", email="support@cvexpress.com"),
         license=openapi.License(name="MIT License"),
     ),
     public=True,

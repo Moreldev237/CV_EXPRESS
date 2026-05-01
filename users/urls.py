@@ -9,6 +9,8 @@ from .views import (
     ProfileView,
     UpdateProfileView,
     UploadProfileImageView,
+    VerifyRegistrationOTPView,
+    RequestNewOTPView,
 )
 
 urlpatterns = [
@@ -18,6 +20,8 @@ urlpatterns = [
 
     # 👤 User management
     path('register/', RegisterView.as_view(), name='register'),
+    path('auth/verify-otp/', VerifyRegistrationOTPView.as_view(), name='verify-otp'),
+    path('auth/resend-otp/', RequestNewOTPView.as_view(), name='resend-otp'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('profile/update/', UpdateProfileView.as_view(), name='profile-update'),
 
