@@ -81,14 +81,15 @@ WSGI_APPLICATION = 'CV_EXPRESS.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3') if os.getenv('DB_ENGINE') == 'django.db.backends.sqlite3' else os.getenv('DB_NAME'),
+        'ENGINE': DB_ENGINE,
+        'NAME': os.getenv('DB_NAME', str(BASE_DIR / 'db.sqlite3')) if DB_ENGINE == 'django.db.backends.sqlite3' else os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER', ''),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', ''),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
