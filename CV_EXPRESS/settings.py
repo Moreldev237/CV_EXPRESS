@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     #ajout de l'application "cv"
     'users',
+    'CV_BUILDER',
 ]
 
 # Custom user model
