@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'CV_BUILDER',
     'COVER_LETTER',
     'SUBSCRIPTION',
+    'ANALYTICS',
 ]
 
 # Custom user model

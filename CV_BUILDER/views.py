@@ -8,6 +8,7 @@ from weasyprint import HTML
 from drf_yasg.utils import swagger_auto_schema
 from .models import CV, Template
 from .serializers import CVSerializer, CVFullSerializer, TemplateSerializer
+from ANALYTICS.utils import log_activity
 
 class CVListCreateView(generics.ListCreateAPIView):
     """Liste et création de CV pour l'utilisateur connecté."""
@@ -19,6 +20,10 @@ class CVListCreateView(generics.ListCreateAPIView):
 
     @swagger_auto_schema(tags=['CV Builder'], operation_summary="Créer un nouveau CV", request_body=CVSerializer)
     def post(self, request, *args, **kwargs): return super().post(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        cv = serializer.save()
+        log_activity(self.request.user, "CV_CREATED", "CV_BUILDER", {"cv_id": cv.id, "title": cv.title}, request=self.request)
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -112,5 +117,7 @@ class ExportCVPDFView(APIView):
         # 5. Préparation de la réponse HTTP pour le téléchargement
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="cv_{cv.id}.pdf"'
-        
+
+        log_activity(request.user, "CV_PDF_EXPORTED", "CV_BUILDER", {"cv_id": cv.id}, request=request)
+
         return response

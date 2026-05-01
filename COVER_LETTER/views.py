@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import CoverLetter, CoverLetterTemplate
 from .serializers import CoverLetterSerializer, CoverLetterTemplateSerializer
+from ANALYTICS.utils import log_activity
 
 class CoverLetterListCreateView(generics.ListCreateAPIView):
     """Liste et création de lettres de motivation."""
@@ -26,6 +27,10 @@ class CoverLetterListCreateView(generics.ListCreateAPIView):
     @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Lister ou créer des lettres", request_body=CoverLetterSerializer)
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        letter = serializer.save()
+        log_activity(self.request.user, "LETTER_CREATED", "COVER_LETTER", {"letter_id": letter.id}, request=self.request)
 
 class CoverLetterDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Détail, modification et suppression d'une lettre."""
@@ -126,5 +131,7 @@ class ExportCoverLetterPDFView(APIView):
         # 5. Réponse de téléchargement
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="lettre_{letter.id}.pdf"'
-        
+
+        log_activity(request.user, "LETTER_PDF_EXPORTED", "COVER_LETTER", {"letter_id": letter.id}, request=request)
+
         return response
