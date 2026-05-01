@@ -6,16 +6,20 @@ class TemplateSerializer(serializers.ModelSerializer):
         model = Template
         fields = '__all__'
 
+def validate_date_range(data):
+    """Utilitaire de validation pour les plages de dates."""
+    if data.get('end_date') and data.get('start_date'):
+        if data['end_date'] < data['start_date']:
+            raise serializers.ValidationError({"end_date": "La date de fin ne peut pas être antérieure à la date de début."})
+    return data
+
 class ExperienceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experience
         fields = '__all__'
 
     def validate(self, data):
-        if data.get('end_date') and data.get('start_date'):
-            if data['end_date'] < data['start_date']:
-                raise serializers.ValidationError({"end_date": "La date de fin ne peut pas être antérieure à la date de début."})
-        return data
+        return validate_date_range(data)
 
 class EducationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,10 +27,7 @@ class EducationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        if data.get('end_date') and data.get('start_date'):
-            if data['end_date'] < data['start_date']:
-                raise serializers.ValidationError({"end_date": "La date de fin ne peut pas être antérieure à la date de début."})
-        return data
+        return validate_date_range(data)
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
