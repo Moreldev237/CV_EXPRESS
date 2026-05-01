@@ -17,10 +17,12 @@ class CVListCreateView(generics.ListCreateAPIView):
     @swagger_auto_schema(tags=['CV Builder'], operation_summary="Lister les CV de l'utilisateur")
     def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['CV Builder'], operation_summary="Créer un nouveau CV")
+    @swagger_auto_schema(tags=['CV Builder'], operation_summary="Créer un nouveau CV", request_body=CVSerializer)
     def post(self, request, *args, **kwargs): return super().post(request, *args, **kwargs)
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CV.objects.none()
         return CV.objects.filter(user=self.request.user)
 
 class CVDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -30,12 +32,14 @@ class CVDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     @swagger_auto_schema(tags=['CV Builder'], operation_summary="Détails d'un CV")
     def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
-    @swagger_auto_schema(tags=['CV Builder'], operation_summary="Mettre à jour un CV")
+    @swagger_auto_schema(tags=['CV Builder'], operation_summary="Mettre à jour un CV", request_body=CVSerializer)
     def put(self, request, *args, **kwargs): return super().put(request, *args, **kwargs)
     @swagger_auto_schema(tags=['CV Builder'], operation_summary="Supprimer un CV")
     def delete(self, request, *args, **kwargs): return super().delete(request, *args, **kwargs)
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CV.objects.none()
         return CV.objects.filter(user=self.request.user)
 
 class CVFullDetailView(generics.RetrieveAPIView):
@@ -51,6 +55,8 @@ class CVFullDetailView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CV.objects.none()
         return CV.objects.filter(user=self.request.user)
 
 class TemplateListView(generics.ListAPIView):

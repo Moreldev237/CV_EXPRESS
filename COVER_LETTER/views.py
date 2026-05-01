@@ -16,12 +16,14 @@ class CoverLetterListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CoverLetter.objects.none()
         return CoverLetter.objects.filter(user=self.request.user)
 
     @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Lister les lettres de motivation")
     def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Lister ou créer des lettres")
+    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Lister ou créer des lettres", request_body=CoverLetterSerializer)
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
@@ -31,15 +33,17 @@ class CoverLetterDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CoverLetter.objects.none()
         return CoverLetter.objects.filter(user=self.request.user)
 
     @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Gérer une lettre spécifique")
     def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mettre à jour une lettre")
+    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mettre à jour une lettre", request_body=CoverLetterSerializer)
     def put(self, request, *args, **kwargs): return super().put(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mise à jour partielle d'une lettre")
+    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mise à jour partielle d'une lettre", request_body=CoverLetterSerializer)
     def patch(self, request, *args, **kwargs): return super().patch(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Supprimer une lettre")
