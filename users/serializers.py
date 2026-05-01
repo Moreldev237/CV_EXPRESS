@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from .models import User, OTP
-import random
 from django.utils import timezone
-
+from django.utils.crypto import get_random_string
+import random
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -80,7 +80,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
 
         # Générer et enregistrer l'OTP
-        otp_code = str(random.randint(100000, 999999))
+        otp_code = get_random_string(length=6, allowed_chars='0123456789')
         # L'OTP expire après 10 minutes
         expires_at = timezone.now() + timezone.timedelta(minutes=10)
         OTP.objects.create(user=user, code=otp_code, expires_at=expires_at)

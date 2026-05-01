@@ -14,6 +14,12 @@ class CVListCreateView(generics.ListCreateAPIView):
     serializer_class = CVSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(tags=['CV Builder'], operation_summary="Lister les CV de l'utilisateur")
+    def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(tags=['CV Builder'], operation_summary="Créer un nouveau CV")
+    def post(self, request, *args, **kwargs): return super().post(request, *args, **kwargs)
+
     def get_queryset(self):
         return CV.objects.filter(user=self.request.user)
 
@@ -37,6 +43,13 @@ class CVFullDetailView(generics.RetrieveAPIView):
     serializer_class = CVFullSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(
+        tags=['CV Builder'], 
+        operation_summary="Récupérer le CV complet",
+        operation_description="Récupère le CV avec toutes les sections (Expériences, Études, Compétences, etc.) imbriquées."
+    )
+    def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
         return CV.objects.filter(user=self.request.user)
 
@@ -45,6 +58,9 @@ class TemplateListView(generics.ListAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
     permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(tags=['Templates'], operation_summary="Lister les modèles de CV")
+    def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
 
 class TemplateDetailView(generics.RetrieveAPIView):
     """Détail d'un template spécifique."""
