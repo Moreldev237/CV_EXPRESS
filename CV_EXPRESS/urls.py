@@ -25,6 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('users.urls')),
     path('api/', include('CV_BUILDER.urls')),
+    path('api/subscriptions/', include('SUBSCRIPTION.urls')),
+    path('api/analytics/', include('ANALYTICS.urls')),
     
     # 🔗 Swagger / OpenAPI Documentation
     path('api/schema/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

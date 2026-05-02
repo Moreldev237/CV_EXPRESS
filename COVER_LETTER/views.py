@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import CoverLetter, CoverLetterTemplate
 from .serializers import CoverLetterSerializer, CoverLetterTemplateSerializer
+from ANALYTICS.utils import log_activity
 
 class CoverLetterListCreateView(generics.ListCreateAPIView):
     """Liste et création de lettres de motivation."""
@@ -16,14 +17,20 @@ class CoverLetterListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CoverLetter.objects.none()
         return CoverLetter.objects.filter(user=self.request.user)
 
     @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Lister les lettres de motivation")
     def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Lister ou créer des lettres")
+    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Lister ou créer des lettres", request_body=CoverLetterSerializer)
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        letter = serializer.save()
+        log_activity(self.request.user, "LETTER_CREATED", "COVER_LETTER", {"letter_id": letter.id}, request=self.request)
 
 class CoverLetterDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Détail, modification et suppression d'une lettre."""
@@ -31,15 +38,17 @@ class CoverLetterDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CoverLetter.objects.none()
         return CoverLetter.objects.filter(user=self.request.user)
 
     @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Gérer une lettre spécifique")
     def get(self, request, *args, **kwargs): return super().get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mettre à jour une lettre")
+    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mettre à jour une lettre", request_body=CoverLetterSerializer)
     def put(self, request, *args, **kwargs): return super().put(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mise à jour partielle d'une lettre")
+    @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Mise à jour partielle d'une lettre", request_body=CoverLetterSerializer)
     def patch(self, request, *args, **kwargs): return super().patch(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Cover Letter'], operation_summary="Supprimer une lettre")
@@ -122,5 +131,7 @@ class ExportCoverLetterPDFView(APIView):
         # 5. Réponse de téléchargement
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="lettre_{letter.id}.pdf"'
-        
+
+        log_activity(request.user, "LETTER_PDF_EXPORTED", "COVER_LETTER", {"letter_id": letter.id}, request=request)
+
         return response
