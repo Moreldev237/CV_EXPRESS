@@ -6,3 +6,7 @@ __pycache__/
 *.pyc
 .env
 db.sqlite3
+media/
+static/
+.vscode/
+.idea/

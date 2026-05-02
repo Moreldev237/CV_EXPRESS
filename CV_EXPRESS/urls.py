@@ -27,10 +27,11 @@ urlpatterns = [
     path('api/', include('CV_BUILDER.urls')),
     path('api/subscriptions/', include('SUBSCRIPTION.urls')),
     path('api/analytics/', include('ANALYTICS.urls')),
+    path('api/notifications/', include('NOTIFICATIONS.urls')),
     
     # 🔗 Swagger / OpenAPI Documentation
     path('api/schema/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/schema/docs/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('api/schema/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/schema.json/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('api/schema.yaml/', schema_view.without_ui(cache_timeout=0), name='schema-yaml'),
 ]
