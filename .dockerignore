@@ -2,6 +2,7 @@
 **/*.pyo
 **/__pycache__
 .env
+.env.*
 .git
 .gitignore
 .dockerignore

@@ -42,6 +42,16 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+    @property
+    def is_premium(self):
+        subscription = getattr(self, 'subscription', None)
+        return bool(
+            subscription
+            and subscription.status == 'active'
+            and subscription.end_date > timezone.now()
+            and not subscription.plan.is_free
+        )
+
 
 class OTP(models.Model):
     """

@@ -40,3 +40,11 @@ celery -A CV_EXPRESS flower
 
 ---
 **Note :** Vérifiez bien que votre fichier `.env` contient les accès à la base de données et les clés API (OpenAI, Email SMTP) avant de commencer.
+
+## 📈 Stratégie de lancement SaaS
+
+- Proposer un plan gratuit pour capter des utilisateurs rapidement.
+- Mettre en avant un plan Pro avec export illimité, IA avancée et templates premium.
+- Préparer un plan Business pour les besoins entreprise / coaching.
+- Utiliser Stripe pour les paiements récurrents et les webhooks de validation.
+- Proposer un abonnement annuel avec une remise de 20%.

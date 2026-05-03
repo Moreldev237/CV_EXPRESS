@@ -13,3 +13,7 @@ class UserActivity(models.Model):
         verbose_name = "Activité Utilisateur"
         verbose_name_plural = "Activités Utilisateurs"
         ordering = ['-timestamp']
+
+    def __str__(self):
+        timestamp_str = self.timestamp.strftime('%Y-%m-%d %H:%M:%S') if self.timestamp else 'N/A'
+        return f"{self.user.email} - {self.action} - {timestamp_str}"

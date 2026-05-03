@@ -16,6 +16,7 @@ from .views import (
     CreatePaymentIntentView,
     PaymentSuccessView,
     PaymentCancelView,
+    StripeWebhookView,
 
     # Historique
     SubscriptionHistoryView,
@@ -38,6 +39,7 @@ urlpatterns = [
     path('payment/create/', CreatePaymentIntentView.as_view(), name='create-payment'),
     path('payment/success/', PaymentSuccessView.as_view(), name='payment-success'),
     path('payment/cancel/', PaymentCancelView.as_view(), name='payment-cancel'),
+    path('payment/webhook/', StripeWebhookView.as_view(), name='stripe-webhook'),
 
     # ==================== HISTORY ====================
     path('history/', SubscriptionHistoryView.as_view(), name='subscription-history'),

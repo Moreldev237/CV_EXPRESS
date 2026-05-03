@@ -63,6 +63,27 @@
 | **💳 Subscription** | Gestion des abonnements (gratuit / premium), Paiement en ligne |
 | **📊 Analytics** | Statistiques d'utilisation, Activité des utilisateurs |
 | **🔔 Notifications** | Envoi d'emails, Notifications push, Alertes |
+
+## 💰 Modèle de monétisation
+
+CV_EXPRESS est conçu pour devenir un SaaS rentable grâce à une offre d'abonnement claire et évolutive :
+
+- **Free** : accès aux fonctions de base, création d'un CV, templates limités, export simple.
+- **Pro** : export illimité, templates premium, génération IA avancée, lettres de motivation, historique des versions.
+- **Business** : onboarding dédié, recommandations d'offres, matching métier, support prioritaire, multi-utilisateurs.
+
+### Avantages de cette stratégie
+
+- Offrir un palier gratuit pour attirer les utilisateurs et collecter des leads.
+- Un plan Pro accessible pour convertir les utilisateurs engagés.
+- Un plan Business à forte valeur ajoutée pour les recruteurs, coachs ou entreprises.
+
+### Suggestions marketing
+
+- Un essai gratuit 7 à 14 jours pour le plan Pro.
+- Une réduction de 20% sur l'abonnement annuel.
+- Une page tarif claire avec comparaison des fonctionnalités.
+- Une campagne e-mail ciblée pour les freelances et jeunes diplômés.
 | **🎯 Job Match** | Matching compétences / offres, Recommandations personnalisées |
 
 ---
@@ -133,11 +154,17 @@ python manage.py runserver
 # Variables d'environnement recommandées
 export SECRET_KEY=your_secret_key
 export DEBUG=True
+export ALLOWED_HOSTS=localhost,127.0.0.1
 export DB_NAME=cv_express_db
 export DB_USER=postgres
 export DB_PASSWORD=your_password
 export OPENAI_API_KEY=your_api_key
+export STRIPE_SECRET_KEY=your_stripe_secret_key
+export STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+export STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 ```
+
+Créez un fichier `.env` local à partir de `.env.example` et ne le commitez jamais dans Git.  `.env` est déjà ignoré par `.gitignore`.
 
 ### Accès
 

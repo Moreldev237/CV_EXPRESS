@@ -10,6 +10,7 @@ from drf_yasg import openapi
 from .models import CoverLetter, CoverLetterTemplate
 from .serializers import CoverLetterSerializer, CoverLetterTemplateSerializer
 from ANALYTICS.utils import log_activity
+from SUBSCRIPTION.permissions import IsPremiumUser
 
 class CoverLetterListCreateView(generics.ListCreateAPIView):
     """Liste et création de lettres de motivation."""
@@ -102,7 +103,7 @@ class ExportCoverLetterPDFView(APIView):
     """
     Endpoint pour l'exportation de la lettre de motivation en PDF.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsPremiumUser]
 
     @swagger_auto_schema(
         tags=['Cover Letter'], 

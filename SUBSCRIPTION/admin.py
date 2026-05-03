@@ -7,8 +7,9 @@ class PlanAdmin(admin.ModelAdmin):
 
 @admin.register(UserSubscription)
 class UserSubAdmin(admin.ModelAdmin):
-    list_display = ('user', 'plan', 'status', 'end_date')
+    list_display = ('user', 'plan', 'status', 'stripe_customer_id', 'stripe_subscription_id', 'end_date')
     list_filter = ('status', 'plan')
+    search_fields = ('user__email', 'stripe_customer_id', 'stripe_subscription_id')
 
 @admin.register(PaymentHistory)
 class PaymentAdmin(admin.ModelAdmin):

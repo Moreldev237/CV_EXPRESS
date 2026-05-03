@@ -5,8 +5,11 @@ venv/
 __pycache__/
 *.pyc
 .env
+.env.*
+!.env.example
 db.sqlite3
-media/
-static/
-.vscode/
-.idea/
+.env.example
+
+# Ignorons les fichiers de configuration et de déploiement
+PROJECT_HEALTH_AND_IMPROVEMENTS.md
+lancement.md

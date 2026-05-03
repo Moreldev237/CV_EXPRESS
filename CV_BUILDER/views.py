@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .models import CV, Template
 from .serializers import CVSerializer, CVFullSerializer, TemplateSerializer
 from ANALYTICS.utils import log_activity
+from SUBSCRIPTION.permissions import IsPremiumUser
 
 class CVListCreateView(generics.ListCreateAPIView):
     """Liste et création de CV pour l'utilisateur connecté."""
@@ -92,7 +93,7 @@ class ExportCVPDFView(APIView):
     Endpoint pour l'exportation PDF.
     Note: Nécessite l'intégration d'une librairie comme WeasyPrint.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsPremiumUser]
 
     @swagger_auto_schema(tags=['Export'], operation_summary="Générer le CV en format PDF")
     def get(self, request, pk):
