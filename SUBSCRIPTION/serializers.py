@@ -3,8 +3,8 @@ from .models import SubscriptionPlan, UserSubscription, PaymentHistory
 
 
 class SubscriptionPlanSerializer(serializers.ModelSerializer):
-    is_free = serializers.BooleanField(source='is_free', read_only=True)
-    interval_display = serializers.CharField(source='interval_display', read_only=True)
+    is_free = serializers.BooleanField( read_only=True)
+    interval_display = serializers.CharField(read_only=True)
 
     class Meta:
         model = SubscriptionPlan
@@ -28,7 +28,7 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
 
 class UserSubscriptionSerializer(serializers.ModelSerializer):
     plan_details = SubscriptionPlanSerializer(source='plan', read_only=True)
-    remaining_days = serializers.IntegerField(source='remaining_days', read_only=True)
+    remaining_days = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = UserSubscription
