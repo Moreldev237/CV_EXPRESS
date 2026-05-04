@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('users.urls')),
     path('api/', include('CV_BUILDER.urls')),
+    path('api/', include('COVER_LETTER.urls')),
     path('api/subscriptions/', include('SUBSCRIPTION.urls')),
     path('api/analytics/', include('ANALYTICS.urls')),
     path('api/notifications/', include('NOTIFICATIONS.urls')),

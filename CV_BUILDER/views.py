@@ -6,8 +6,8 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from weasyprint import HTML
 from drf_yasg.utils import swagger_auto_schema
-from .models import CV, Template
-from .serializers import CVSerializer, CVFullSerializer, TemplateSerializer
+from .models import CV, Template, Experience, Education, Skill, Language, Project
+from .serializers import CVSerializer, CVFullSerializer, TemplateSerializer, ExperienceSerializer, EducationSerializer, SkillSerializer, LanguageSerializer, ProjectSerializer
 from ANALYTICS.utils import log_activity
 from SUBSCRIPTION.permissions import IsPremiumUser
 
@@ -122,3 +122,143 @@ class ExportCVPDFView(APIView):
         log_activity(request.user, "CV_PDF_EXPORTED", "CV_BUILDER", {"cv_id": cv.id}, request=request)
 
         return response
+
+# ==================== EXPERIENCES ====================
+
+class ExperienceListCreateView(generics.ListCreateAPIView):
+    """Liste et création d'expériences professionnelles pour un CV."""
+    serializer_class = ExperienceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        cv_id = self.kwargs.get('cv_id')
+        if getattr(self, 'swagger_fake_view', False):
+            return Experience.objects.none()
+        return Experience.objects.filter(cv_id=cv_id, cv__user=self.request.user)
+
+    def perform_create(self, serializer):
+        cv_id = self.kwargs.get('cv_id')
+        cv = get_object_or_404(CV, id=cv_id, user=self.request.user)
+        serializer.save(cv=cv)
+
+class ExperienceDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Détails, modification et suppression d'une expérience."""
+    serializer_class = ExperienceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Experience.objects.none()
+        return Experience.objects.filter(cv__user=self.request.user)
+
+# ==================== EDUCATION ====================
+
+class EducationListCreateView(generics.ListCreateAPIView):
+    """Liste et création de formations pour un CV."""
+    serializer_class = EducationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        cv_id = self.kwargs.get('cv_id')
+        if getattr(self, 'swagger_fake_view', False):
+            return Education.objects.none()
+        return Education.objects.filter(cv_id=cv_id, cv__user=self.request.user)
+
+    def perform_create(self, serializer):
+        cv_id = self.kwargs.get('cv_id')
+        cv = get_object_or_404(CV, id=cv_id, user=self.request.user)
+        serializer.save(cv=cv)
+
+class EducationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Détails, modification et suppression d'une formation."""
+    serializer_class = EducationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Education.objects.none()
+        return Education.objects.filter(cv__user=self.request.user)
+
+# ==================== SKILLS ====================
+
+class SkillListCreateView(generics.ListCreateAPIView):
+    """Liste et création de compétences pour un CV."""
+    serializer_class = SkillSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        cv_id = self.kwargs.get('cv_id')
+        if getattr(self, 'swagger_fake_view', False):
+            return Skill.objects.none()
+        return Skill.objects.filter(cv_id=cv_id, cv__user=self.request.user)
+
+    def perform_create(self, serializer):
+        cv_id = self.kwargs.get('cv_id')
+        cv = get_object_or_404(CV, id=cv_id, user=self.request.user)
+        serializer.save(cv=cv)
+
+class SkillDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Détails, modification et suppression d'une compétence."""
+    serializer_class = SkillSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Skill.objects.none()
+        return Skill.objects.filter(cv__user=self.request.user)
+
+# ==================== LANGUAGES ====================
+
+class LanguageListCreateView(generics.ListCreateAPIView):
+    """Liste et création de langues pour un CV."""
+    serializer_class = LanguageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        cv_id = self.kwargs.get('cv_id')
+        if getattr(self, 'swagger_fake_view', False):
+            return Language.objects.none()
+        return Language.objects.filter(cv_id=cv_id, cv__user=self.request.user)
+
+    def perform_create(self, serializer):
+        cv_id = self.kwargs.get('cv_id')
+        cv = get_object_or_404(CV, id=cv_id, user=self.request.user)
+        serializer.save(cv=cv)
+
+class LanguageDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Détails, modification et suppression d'une langue."""
+    serializer_class = LanguageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Language.objects.none()
+        return Language.objects.filter(cv__user=self.request.user)
+
+# ==================== PROJECTS ====================
+
+class ProjectListCreateView(generics.ListCreateAPIView):
+    """Liste et création de projets pour un CV."""
+    serializer_class = ProjectSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        cv_id = self.kwargs.get('cv_id')
+        if getattr(self, 'swagger_fake_view', False):
+            return Project.objects.none()
+        return Project.objects.filter(cv_id=cv_id, cv__user=self.request.user)
+
+    def perform_create(self, serializer):
+        cv_id = self.kwargs.get('cv_id')
+        cv = get_object_or_404(CV, id=cv_id, user=self.request.user)
+        serializer.save(cv=cv)
+
+class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Détails, modification et suppression d'un projet."""
+    serializer_class = ProjectSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Project.objects.none()
+        return Project.objects.filter(cv__user=self.request.user)
