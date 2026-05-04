@@ -67,7 +67,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Par défaut, le compte est inactif jusqu'à la vérification OTP
         validated_data.pop('password_confirm')
-        email = validated_data.get('email')
+        email = validated_data.pop('email')
         password = validated_data.pop('password')
 
         # On utilise l'email comme username car Django (AbstractUser) nécessite un username unique

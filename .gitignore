@@ -1,15 +1,46 @@
-#ignorons l'environnement virtuel et les dépendances spécifiques à ce projet
-venv
-/venv
-venv/
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
-.env
-.env.*
-!.env.example
-db.sqlite3
-.env.example
+*.pyd
+*.pyo
+*.egg-info/
+.Python
 
-# Ignorons les fichiers de configuration et de déploiement
+# Environments
+.env
+venv/
+env/
+
+# Databases
+*.sqlite3
+
+# Media files (user uploads)
+/media/
+
+# Static files (collected static files)
+/staticfiles/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node.js dependencies
+/frontend/node_modules/
+/frontend/build/
+/frontend/dist/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Celery
+celerybeat.pid
+celeryd.pid
+
+# TypeScript build info
+*.tsbuildinfo
+
 PROJECT_HEALTH_AND_IMPROVEMENTS.md
-lancement.md

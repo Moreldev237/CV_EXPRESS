@@ -97,7 +97,7 @@ CV_EXPRESS est conçu pour devenir un SaaS rentable grâce à une offre d'abonne
 | **Authentification** | JWT (Simple JWT) |
 | **IA** | OpenAI API |
 | **Export PDF** | WeasyPrint, ReportLab |
-| **Frontend** | Flutter / React *(en option)* |
+| **Frontend** | React + Vite |
 
 ### Outils recommandés
 
@@ -144,8 +144,13 @@ python manage.py migrate
 # Créer un superutilisateur
 python manage.py createsuperuser
 
-# Lancer le serveur
+# Lancer le backend
 python manage.py runserver
+
+# Frontend local (React + Vite)
+cd frontend
+npm install
+npm run dev
 ```
 
 ### Configuration
