@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
 
+    # Frontend
+    'frontend',
+
     'users',
     'CV_BUILDER',
     'COVER_LETTER',
@@ -149,6 +152,7 @@ X_FRAME_OPTIONS = 'DENY'
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Media files (User uploaded files)
 MEDIA_URL = '/media/'
