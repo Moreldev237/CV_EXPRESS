@@ -1,148 +1,167 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}CV Express - Créez votre CV en quelques minutes{% endblock %}
+{% block title %}Accueil - CV Express{% endblock %}
 
 {% block content %}
-<!-- Section Hero -->
-<section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-5xl font-bold mb-6">Créez votre CV Professionnel en Quelques Minutes</h1>
-        <p class="text-xl mb-8 text-blue-100">Utilisez l'assistance IA pour générer un CV impressionnant, des lettres de motivation personnalisées et bien plus.</p>
-        <div class="flex justify-center space-x-4">
-            <a href="/auth" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
-                <i class="fas fa-rocket mr-2"></i>Commencer Gratuitement
-            </a>
-            <a href="#features" class="bg-blue-700 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-800 transition">
-                <i class="fas fa-play mr-2"></i>Découvrir Plus
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- Section Fonctionnalités -->
-<section id="features" class="py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-4xl font-bold text-center mb-16">Nos Fonctionnalités</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Feature 1 -->
-            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition">
-                <div class="text-4xl mb-4 text-blue-600">
-                    <i class="fas fa-magic"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Assistance IA</h3>
-                <p class="text-gray-600">Laissez l'IA vous aider à générer du contenu professionnel, à corriger la grammaire et à améliorer votre CV.</p>
-            </div>
-            
-            <!-- Feature 2 -->
-            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition">
-                <div class="text-4xl mb-4 text-blue-600">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Templates Modernes</h3>
-                <p class="text-gray-600">Choisissez parmi nos templates professionnels et personnalisez-les selon vos préférences.</p>
-            </div>
-            
-            <!-- Feature 3 -->
-            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition">
-                <div class="text-4xl mb-4 text-blue-600">
-                    <i class="fas fa-download"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Export Facile</h3>
-                <p class="text-gray-600">Téléchargez votre CV en PDF ou DOCX avec un seul clic. Prêt à partager avec les recruteurs.</p>
-            </div>
-            
-            <!-- Feature 4 -->
-            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition">
-                <div class="text-4xl mb-4 text-blue-600">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Lettres de Motivation</h3>
-                <p class="text-gray-600">Générez automatiquement des lettres de motivation personnalisées pour chaque offre d'emploi.</p>
-            </div>
-            
-            <!-- Feature 5 -->
-            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition">
-                <div class="text-4xl mb-4 text-blue-600">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Analytiques</h3>
-                <p class="text-gray-600">Suivez vos statistiques, vos candidatures et obtenez des recommandations personnalisées.</p>
-            </div>
-            
-            <!-- Feature 6 -->
-            <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition">
-                <div class="text-4xl mb-4 text-blue-600">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Sécurisé</h3>
-                <p class="text-gray-600">Vos données sont chiffrées et sécurisées. Confidentialité garantie à 100%.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Section Pricing -->
-<section id="pricing" class="bg-gray-100 py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-4xl font-bold text-center mb-16">Nos Tarifs</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Plan Gratuit -->
-            <div class="bg-white p-8 rounded-lg shadow-lg">
-                <h3 class="text-2xl font-bold mb-4">Gratuit</h3>
-                <div class="text-4xl font-bold text-blue-600 mb-6">0€<span class="text-lg text-gray-600">/mois</span></div>
-                <ul class="space-y-4 mb-8 text-gray-600">
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>1 CV</li>
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>Templates basiques</li>
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>Export PDF</li>
-                    <li><i class="fas fa-times text-red-500 mr-2"></i>Lettres de motivation</li>
-                    <li><i class="fas fa-times text-red-500 mr-2"></i>IA avancée</li>
-                </ul>
-                <button onclick="goToAuth()" class="w-full bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold hover:bg-gray-400 transition">Commencer</button>
-            </div>
-            
-            <!-- Plan Pro -->
-            <div class="bg-blue-600 text-white p-8 rounded-lg shadow-lg transform scale-105">
-                <div class="bg-blue-700 text-center py-2 rounded mb-4 font-bold">POPULAIRE</div>
-                <h3 class="text-2xl font-bold mb-4">Pro</h3>
-                <div class="text-4xl font-bold mb-6">9,99€<span class="text-lg">/mois</span></div>
-                <ul class="space-y-4 mb-8">
-                    <li><i class="fas fa-check mr-2"></i>CVs illimités</li>
-                    <li><i class="fas fa-check mr-2"></i>Templates premium</li>
-                    <li><i class="fas fa-check mr-2"></i>Export PDF & DOCX</li>
-                    <li><i class="fas fa-check mr-2"></i>Lettres de motivation</li>
-                    <li><i class="fas fa-check mr-2"></i>IA avancée</li>
-                </ul>
-                <button onclick="goToAuth()" class="w-full bg-white text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-gray-100 transition">Essayer Gratuitement</button>
-            </div>
-            
-            <!-- Plan Business -->
-            <div class="bg-white p-8 rounded-lg shadow-lg">
-                <h3 class="text-2xl font-bold mb-4">Business</h3>
-                <div class="text-4xl font-bold text-blue-600 mb-6">29,99€<span class="text-lg text-gray-600">/mois</span></div>
-                <ul class="space-y-4 mb-8 text-gray-600">
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>Tout du plan Pro</li>
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>Matching d'offres</li>
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>Support prioritaire</li>
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>Multi-utilisateurs</li>
-                    <li><i class="fas fa-check text-green-500 mr-2"></i>API access</li>
-                </ul>
-                <button onclick="goToAuth()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition">Contactez-nous</button>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Section CTA -->
-<section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-4xl font-bold mb-6">Prêt à Créer Votre CV?</h2>
-        <p class="text-xl mb-8">Inscrivez-vous gratuitement et commencez dès aujourd'hui.</p>
-        <a href="/auth" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition inline-block">
-            <i class="fas fa-arrow-right mr-2"></i>Commencer Maintenant
+<!-- Hero Section -->
+<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-blue-600 to-emerald-600 text-white relative overflow-hidden">
+  <div class="absolute inset-0 bg-black/20"></div>
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-24">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-5xl md:text-7xl font-black mb-8 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent animate-fade-in">
+        Créez votre <span class="bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text text-transparent">CV parfait</span><br>
+        en <span class="text-6xl">5 minutes</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-blue-100 mb-12 max-w-2xl mx-auto leading-relaxed opacity-90">
+        Templates professionnels, IA intelligente, export PDF illimité. 
+        Utilisé par 10k+ candidats. Gratuit pour commencer.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+        <a href="/auth/register/" class="btn-primary text-lg py-4 px-8 transform hover:scale-105">
+          Commencer gratuitement
         </a>
+        <a href="#features" class="font-semibold text-white hover:text-emerald-300 transition py-4 px-8">
+          Voir les fonctionnalités
+        </a>
+      </div>
+      
+      <!-- Stats -->
+      <div class="grid md:grid-cols-4 gap-8 text-center mb-16">
+        <div class="fade-in-up animation-delay-200">
+          <div class="text-4xl font-black text-emerald-400 mb-2">10k+</div>
+          <div class="text-blue-100">CV créés</div>
+        </div>
+        <div class="fade-in-up animation-delay-400">
+          <div class="text-4xl font-black text-emerald-400 mb-2">50+</div>
+          <div class="text-blue-100">Templates</div>
+        </div>
+        <div class="fade-in-up animation-delay-600">
+          <div class="text-4xl font-black text-emerald-400 mb-2">99%</div>
+          <div class="text-blue-100">Satisfaction</div>
+        </div>
+        <div class="fade-in-up animation-delay-800">
+          <div class="text-4xl font-black text-emerald-400 mb-2">24h</div>
+          <div class="text-blue-100">Support</div>
+        </div>
+      </div>
     </div>
+    
+    <!-- Hero image mock -->
+    <div class="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-r from-emerald-500/30 to-blue-500/30 flex items-end justify-end p-12 opacity-80">
+      <div class="w-96 h-96 bg-white/20 rounded-3xl blur-xl"></div>
+    </div>
+  </div>
 </section>
 
+<!-- Features Section -->
+<section id="features" class="py-24 bg-white dark:bg-gray-900">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20">
+      <h2 class="section-header dark:from-gray-100 dark:to-gray-300">Tout ce dont vous avez besoin pour un CV parfait</h2>
+      <p class="text-xl text-gray-600 dark:text-gray-400 mt-6 max-w-2xl mx-auto">
+        Interface intuitive, résultats professionnels. Pas besoin d'être designer.
+      </p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Feature 1 -->
+      <div class="group card-hover p-8 rounded-3xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800 dark:to-gray-700/50">
+        <div class="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition">CV Builder Intelligent</h3>
+        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">Glissez-déposez vos expériences, formations, compétences. Prévisualisation en temps réel.</p>
+        <ul class="space-y-2 text-sm text-gray-500 dark:text-gray-500 mb-6">
+          <li class="flex items-center"><svg class="w-4 h-4 text-emerald-500 mr-2">✓</svg> Sections personnalisables</li>
+          <li class="flex items-center"><svg class="w-4 h-4 text-emerald-500 mr-2">✓</svg> Multi-langues</li>
+        </ul>
+        <a href="/cv-builder/" class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-700 transition">Essayer →</a>
+      </div>
+      
+      <!-- Feature 2 -->
+      <div class="group card-hover p-8 rounded-3xl border border-gray-200 dark:border-gray-700">
+        <div class="w-16 h-16 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Templates Premium</h3>
+        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">50+ templates designés par des experts RH. Adaptez les couleurs, polices à votre style.</p>
+        <ul class="space-y-2 text-sm text-gray-500 dark:text-gray-500 mb-6">
+          <li class="flex items-center"><svg class="w-4 h-4 text-emerald-500 mr-2">✓</svg> Modernes & classiques</li>
+          <li class="flex items-center"><svg class="w-4 h-4 text-emerald-500 mr-2">✓</svg> ATS-friendly</li>
+        </ul>
+        <a href="/cv-builder/" class="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition">Découvrir →</a>
+      </div>
+      
+      <!-- Feature 3 -->
+      <div class="group card-hover p-8 rounded-3xl border border-gray-200 dark:border-gray-700 lg:col-span-2 md:col-span-2">
+        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 group-hover:text-purple-600 transition">Export PDF Professionnel</h3>
+        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">Téléchargez en 1-clic en haute qualité PDF. Parfait pour les recruteurs et l'impression.</p>
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+          <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/50 rounded-2xl">
+            <div class="text-3xl font-black text-purple-600 mb-2">Premium</div>
+            <div>Exports illimités</div>
+          </div>
+          <div class="text-center p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/50 rounded-2xl">
+            <div class="text-3xl font-black text-emerald-600 mb-2">Gratuit</div>
+            <div>3 exports/mois</div>
+          </div>
+        </div>
+        <a href="/subscription/" class="btn-success text-lg py-3 px-8">
+          Choisir Premium
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-24 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 class="text-4xl md:text-5xl font-black mb-6">
+      Prêt à décrocher votre prochain job ?
+    </h2>
+    <p class="text-xl text-emerald-100 mb-12 max-w-2xl mx-auto">
+      Rejoignez 10k+ candidats qui ont boosté leur carrière avec CV Express.
+    </p>
+    <a href="/auth/register/" class="btn-primary text-xl py-5 px-12 inline-block transform hover:scale-105 shadow-2xl">
+      Créer mon CV gratuit
+    </a>
+  </div>
+</section>
+
+<style>
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fade-in 1s ease-out forwards; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-600 { animation-delay: 0.6s; }
+.animation-delay-800 { animation-delay: 0.8s; }
+.animate-fade-in { animation: fade-in 1.5s ease-out; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^=\"#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+});
+</script>
 {% endblock %}

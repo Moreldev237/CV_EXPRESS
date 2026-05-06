@@ -22,7 +22,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', include('frontend.urls')),  # Frontend pages
+    path('', include('CV_EXPRESS.frontend_urls')),
     path('admin/', admin.site.urls),
     path('api/', include('users.urls')),
     path('api/', include('CV_BUILDER.urls')),

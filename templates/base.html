@@ -1,129 +1,166 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CV Express - Créez votre CV professionnel{% endblock %}</title>
-    
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome pour les icônes -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- CSS personnalisé -->
-    <link rel="stylesheet" href="/static/css/main.css">
-    
+    <title>{% block title %}CV Express - Créez votre CV parfait{% endblock %}</title>
+
+    <!-- Tailwind (une seule fois avec plugins) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="icon" href="{% static 'img/logo.png' %}" type="image/png">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        emerald: {
+                            500: '#10b981',
+                            600: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script defer src="{% static 'js/app.js' %}"></script>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-file-pdf text-blue-600 text-2xl"></i>
-                    <a href="/" class="text-2xl font-bold text-gray-800">CV Express</a>
-                </div>
-                
-                <!-- Menu desktop -->
-                <div class="hidden md:flex space-x-8">
-                    <a href="/" class="text-gray-700 hover:text-blue-600 transition">Accueil</a>
-                    <a href="#features" class="text-gray-700 hover:text-blue-600 transition">Fonctionnalités</a>
-                    <a href="#pricing" class="text-gray-700 hover:text-blue-600 transition">Tarifs</a>
-                </div>
-                
-                <!-- Boutons d'authentification -->
-                <div class="flex space-x-4" id="auth-buttons">
-                    <a href="/auth" class="text-gray-700 hover:text-blue-600 transition font-medium">Connexion</a>
-                    <a href="/auth" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">S'inscrire</a>
-                </div>
-                
-                <!-- Menu utilisateur (caché par défaut) -->
-                <div class="hidden space-x-4" id="user-menu">
-                    <a href="/dashboard" class="text-gray-700 hover:text-blue-600 transition font-medium">Dashboard</a>
-                    <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">Déconnexion</button>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Contenu principal -->
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-lg font-bold mb-4">CV Express</h3>
-                    <p class="text-gray-400">Créez votre CV professionnel en quelques minutes avec l'aide de l'IA.</p>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4">Produit</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition">Fonctionnalités</a></li>
-                        <li><a href="#" class="hover:text-white transition">Templates</a></li>
-                        <li><a href="#" class="hover:text-white transition">Tarifs</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4">Légal</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition">Confidentialité</a></li>
-                        <li><a href="#" class="hover:text-white transition">Conditions</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4">Suivez-nous</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-github"></i></a>
+<!-- Navbar -->
+<nav class="bg-white dark:bg-gray-800 shadow-lg border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between h-16 items-center">
+
+            <!-- Logo -->
+            <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary-600 to-emerald-600 bg-clip-text text-transparent">
+                CV Express
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-4">
+                {% if user.is_authenticated %}
+                    <a href="/dashboard/" class="hover:text-primary-600">Dashboard</a>
+                    <a href="/subscription/" class="hover:text-primary-600">Abonnement</a>
+
+                    <!-- Profile -->
+                    <div class="relative">
+                        <div id="user-profile" onclick="toggleUserMenu()" class="flex items-center space-x-2 cursor-pointer">
+                            
+                            <img 
+                                src="{% if user.profile_image and user.profile_image.name != 'default_profile.png' %}{{ user.profile_image.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" 
+                                class="w-8 h-8 rounded-full"
+                            >
+
+                            <span>{{ user.first_name|default:user.email|slice:":15" }}</span>
+                        </div>
+
+                        <!-- Dropdown -->
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                            <a href="/profile/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profil</a>
+
+                            <button type="button" onclick="logout()" class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                Déconnexion
+                            </button>
+
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 CV Express. Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
 
-    <!-- Scripts -->
-    <script src="/static/js/config.js"></script>
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/auth.js"></script>
-    <script src="/static/js/app.js"></script>
-    <script src="/static/js/ui.js"></script>
-    
-    <script>
-        // Initialize API after api.js is loaded
-        if (typeof APIClient !== 'undefined' && typeof api === 'undefined') {
-            window.api = new APIClient();
-        }
-        
-        // Set up API interceptor
-        if (typeof setupApiInterceptor === 'function') {
-            setupApiInterceptor();
-        }
-        
-        // Update UI based on authentication state
-        if (typeof updateAuthUI === 'function') {
-            updateAuthUI();
-        }
-    </script>
-    
-    {% block extra_js %}{% endblock %}
-    
-    <script>
-        // Vérifier l'authentification au chargement de la page
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
-        });
-    </script>
+                {% else %}
+                    <a href="/auth/register/" class="text-primary-600">S'inscrire</a>
+                    <a href="/auth/login/" class="bg-primary-600 text-white px-4 py-2 rounded-lg">Se connecter</a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2">
+                ☰
+            </button>
+
+        </div>
+    </div>
+</nav>
+
+<!-- Messages -->
+{% if messages %}
+<div class="max-w-7xl mx-auto p-4">
+    {% for message in messages %}
+        <div class="mb-3 p-3 rounded 
+            {% if message.tags == 'success' %}bg-green-100 text-green-800
+            {% elif message.tags == 'error' %}bg-red-100 text-red-800
+            {% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Content -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="mt-10 bg-gray-900 text-white py-10 text-center">
+    <p>© 2026 CV Express</p>
+</footer>
+
+{% block extra_js %}{% endblock %}
+
+<script>
+/* ===== INIT ===== */
+document.addEventListener("DOMContentLoaded", () => {
+    initApp?.();
+});
+
+/* ===== USER MENU ===== */
+function toggleUserMenu() {
+    document.getElementById("user-menu").classList.toggle("hidden");
+}
+
+/* click outside */
+document.addEventListener("click", (e) => {
+    const menu = document.getElementById("user-menu");
+    const profile = document.getElementById("user-profile");
+
+    if (menu && !profile.contains(e.target)) {
+        menu.classList.add("hidden");
+    }
+});
+
+/* ===== DARK MODE ===== */
+if (localStorage.theme === 'dark' || 
+    (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+} else {
+    document.documentElement.classList.remove('dark');
+}
+
+/* toggle */
+function toggleTheme() {
+    const html = document.documentElement;
+    html.classList.toggle("dark");
+    localStorage.theme = html.classList.contains("dark") ? "dark" : "light";
+}
+
+/* ===== MOBILE MENU (placeholder) ===== */
+document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
+    alert("Menu mobile à implémenter");
+});
+</script>
+
 </body>
 </html>

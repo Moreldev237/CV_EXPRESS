@@ -3,11 +3,15 @@ from .models import User, OTP
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 import random
+import logging
+from django.core.mail import send_mail
+from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for User model - Read operations
     """
+    profile_image = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     completion_percentage = serializers.SerializerMethodField()
 
@@ -20,6 +24,14 @@ class UserSerializer(serializers.ModelSerializer):
             'completion_percentage', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_profile_image(self, obj):
+        if obj.profile_image and obj.profile_image.name != 'default_profile.png':
+            try:
+                return obj.profile_image.url
+            except Exception:
+                pass
+        return None
 
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip() or obj.username
@@ -93,7 +105,20 @@ class RegisterSerializer(serializers.ModelSerializer):
         #     [user.email],
         #     fail_silently=False,
         # )
-        print(f"DEBUG: OTP for {user.email}: {otp_code}") # À supprimer en production
+        logger = logging.getLogger(__name__)
+        logger.info(f"OTP generated for {user.email}: {otp_code}")
+        
+        # Send OTP email
+        try:
+            send_mail(
+                'Votre code de vérification CV_EXPRESS',
+                f'Bonjour,\n\nVotre code de vérification est : {otp_code}\n\nCe code expirera dans 10 minutes.',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            logger.error(f"Failed to send OTP email to {user.email}: {e}")
         
         return user
 

@@ -1,5 +1,10 @@
+import logging
+
 import openai
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
 
 class AIService:
     """Service centralisé pour gérer les interactions avec OpenAI."""
@@ -29,7 +34,7 @@ class AIService:
             )
             return response.choices[0].message.content
         except Exception as e:
-            print(f"Erreur OpenAI: {e}")
+            logger.error(f"OpenAI error: {e}")
             return None
 
     def improve_content(self, text, context="professionnel"):

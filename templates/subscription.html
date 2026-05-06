@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Abonnement - CV Express{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header -->
+    <div class="text-center mb-20">
+      <h1 class="text-4xl md:text-6xl font-black bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-6">
+        Choisissez votre plan
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
+        Export illimité, templates premium, support prioritaire. Annulez quand vous voulez.
+      </p>
+      <div class="inline-flex items-center px-6 py-2 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 rounded-full text-sm font-semibold">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        Aucun engagement - Annulation facile
+      </div>
+    </div>
+    
+    <!-- Plans Comparison -->
+    <div class="grid md:grid-cols-3 gap-8 mb-20">
+      <div id="plans-container">
+        <!-- Dynamic plans will be loaded here -->
+        <div class="animate-pulse md:col-span-3">
+          <div class="h-96 bg-gray-200 dark:bg-gray-700 rounded-3xl"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Current Subscription -->
+    <div class="text-center mb-20">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Votre abonnement actuel</h2>
+      <div id="current-subscription" class="max-w-2xl mx-auto">
+        <div class="animate-pulse bg-gray-100 dark:bg-gray-700 h-32 rounded-2xl p-8 mb-6"></div>
+        <p class="text-gray-600 dark:text-gray-400">Chargement...</p>
+      </div>
+    </div>
+    
+    <!-- Features Comparison -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-12 border border-gray-200 dark:border-gray-700 shadow-2xl mb-20">
+      <h2 class="text-center text-3xl font-bold text-gray-900 dark:text-white mb-12">
+        Tous les plans incluent
+      </h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <h4 class="font-bold text-xl mb-2">Export PDF</h4>
+          <p class="text-gray-600 dark:text-gray-400">Téléchargement haute qualité</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <h4 class="font-bold text-xl mb-2">Templates</h4>
+          <p class="text-gray-600 dark:text-gray-400">50+ designs professionnels</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h4 class="font-bold text-xl mb-2">Support</h4>
+          <p class="text-gray-600 dark:text-gray-400">24h/24 réponse garantie</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- CTA -->
+    <div class="text-center">
+      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+        Questions ? Contactez-nous
+      </h3>
+      <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+        support@cvexpress.com ou chat en direct
+      </p>
+      <a href="/dashboard/" class="inline-flex items-center px-8 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-bold rounded-xl hover:shadow-xl transition-all duration-200">
+        ← Retour au tableau de bord
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!cvApp.getAccessToken()) {
+    window.location.href = '/auth/login/?next=/subscription/';
+    return;
+  }
+  
+  await loadSubscriptionPage();
+});
+
+async function loadSubscriptionPage() {
+  cvApp.showLoading();
+  
+  try {
+    // Load plans
+    const plans = await cvApp.apiGet('subscriptions/plans/');
+    renderPlans(plans);
+    
+    // Load current subscription
+    const sub = await cvApp.apiGet('subscriptions/');
+    renderCurrentSubscription(sub);
+    
+  } catch (error) {
+    cvApp.showToast('Erreur: ' + error.message, 'error');
+  } finally {
+    cvApp.hideLoading();
+  }
+}
+
+function renderPlans(plans) {
+  const container = document.getElementById('plans-container');
+  container.innerHTML = '';
+  
+  plans.forEach((plan, index) => {
+    const isPremium = !plan.is_free;
+    const isRecommended = index === 1; // Middle plan
+    
+    const card = document.createElement('div');
+    card.className = `relative rounded-3xl p-8 shadow-2xl border-4 transition-all duration-300 card-hover ${
+      isPremium ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/50' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+    } ${isRecommended ? 'ring-4 ring-emerald-200 dark:ring-emerald-800/50 scale-105' : ''}`;
+    
+    card.innerHTML = `
+      <div class="absolute -top-5 left-1/2 transform -translate-x-1/2">
+        <span class="${isPremium ? 'bg-emerald-500 text-white shadow-lg' : 'bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white'} px-4 py-1 rounded-full text-sm font-bold">
+          ${plan.is_free ? 'GRATUIT' : 'PREMIUM'}
+        </span>
+      </div>
+      
+      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">${plan.name}</h3>
+      <div class="text-4xl font-black text-emerald-600 mb-2 text-center">${plan.price === 0 ? 'GRATUIT' : plan.price.toFixed(0) + '€'}</div>
+      <div class="text-2xl text-gray-600 dark:text-gray-400 mb-8 text-center">/ ${plan.duration_months === 1 ? 'mois' : 'an'}</div>
+      
+      <ul class="space-y-3 mb-10">
+        <li class="flex items-center"><svg class="w-6 h-6 text-emerald-500 mr-3 flex-shrink-0">✓</svg>${plan.exports_per_month} exports PDF/mois</li>
+        <li class="flex items-center"><svg class="w-6 h-6 text-emerald-500 mr-3 flex-shrink-0">✓</svg>${plan.templates_count} templates premium</li>
+        <li class="flex items-center"><svg class="w-6 h-6 text-emerald-500 mr-3 flex-shrink-0">✓</svg>Support ${plan.support_level}</li>
+        ${isPremium ? '<li class="flex items-center"><svg class="w-6 h-6 text-emerald-500 mr-3 flex-shrink-0">⭐</svg>Support prioritaire 24h</li>' : ''}
+      </ul>
+      
+      <button onclick="subscribe(${plan.id})" class="w-full py-4 px-6 font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-lg ${
+        isPremium ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white' : 
+        'bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200'
+      }">
+        ${plan.is_free ? 'Commencer gratuitement' : 'Choisir Premium'}
+      </button>
+    `;
+    
+    container.appendChild(card);
+  });
+}
+
+function renderCurrentSubscription(sub) {
+  const container = document.getElementById('current-subscription');
+  if (!sub) {
+    container.innerHTML = '<p class="text-gray-600 dark:text-gray-400 text-lg text-center py-12">Aucun abonnement actif</p>';
+    return;
+  }
+  
+  container.innerHTML = `
+    <div class="p-8 bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-blue-900/30 dark:to-emerald-900/30 rounded-2xl border-2 border-blue-200 dark:border-blue-800">
+      <div class="flex items-center justify-between mb-4">
+        <span class="px-4 py-2 bg-blue-500 text-white rounded-xl text-sm font-bold">Actif</span>
+        <span class="text-sm font-semibold text-emerald-600">${sub.plan.name}</span>
+      </div>
+      <div class="text-3xl font-black text-gray-900 dark:text-white mb-2">${sub.plan.price.toFixed(0)}€ / ${sub.plan.duration_months === 1 ? 'mois' : 'an'}</div>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">Renouvellement le <strong>${new Date(sub.end_date).toLocaleDateString('fr-FR')}</strong></p>
+      <div class="flex gap-3">
+        <a href="/subscription/cancel/" class="flex-1 text-center py-3 px-6 bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 rounded-xl font-semibold hover:bg-red-200 transition">
+          Résilier
+        </a>
+        <button onclick="upgradePlan()" class="flex-1 text-center py-3 px-6 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 rounded-xl font-semibold hover:bg-emerald-200 transition">
+          Passer Premium
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+async function subscribe(planId) {
+  cvApp.showLoading();
+  
+  try {
+    const response = await cvApp.apiPost('subscriptions/subscribe/', { plan_id: planId });
+    
+    if (response.checkout_url) {
+      // Stripe checkout
+      window.location.href = response.checkout_url;
+    } else {
+      // Free plan
+      cvApp.showToast('Abonnement activé !', 'success');
+      setTimeout(() => location.reload(), 1500);
+    }
+  } catch (error) {
+    cvApp.showToast('Erreur: ' + error.message, 'error');
+  } finally {
+    cvApp.hideLoading();
+  }
+}
+
+function upgradePlan() {
+  cvApp.showToast('Redirection vers Premium...', 'info');
+  // Logic for upgrade
+}
+</script>
+{% endblock %}

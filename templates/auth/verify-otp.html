@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vérification OTP - CV Express{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 to-primary-50 dark:from-gray-900 dark:to-gray-800">
+  <div class="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
+    <div>
+      <div class="mx-auto h-20 w-20 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <h2 class="text-center text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        Vérifiez votre email
+      </h2>
+      <p class="text-center text-gray-600 dark:text-gray-400 mb-2">
+        Un code de vérification a été envoyé à
+      </p>
+      <p id="email-display" class="text-center font-semibold text-lg text-primary-600 dark:text-primary-400 mb-8">
+        votre@email.com
+      </p>
+    </div>
+    
+    <div class="text-center mb-8 p-6 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl">
+      <div class="text-emerald-800 dark:text-emerald-200 text-sm mb-2">✅ Code envoyé</div>
+      <p class="text-xs text-emerald-700 dark:text-emerald-300">
+        Expire dans <span id="countdown">10:00</span>. <a href="#" onclick="resendOTP()" class="underline font-semibold">Renvoyer ?</a>
+      </p>
+    </div>
+    
+    <form id="otp-form" class="space-y-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">
+          Entrez le code à 6 chiffres
+        </label>
+        <div class="flex justify-center space-x-3 mb-6">
+          <input type="text" class="otp-input h-16 w-16 text-2xl font-bold text-center border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-lg transition-all duration-200 mx-1" maxlength="1" name="otp_0">
+          <input type="text" class="otp-input h-16 w-16 text-2xl font-bold text-center border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-lg transition-all duration-200 mx-1" maxlength="1" name="otp_1">
+          <input type="text" class="otp-input h-16 w-16 text-2xl font-bold text-center border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-lg transition-all duration-200 mx-1" maxlength="1" name="otp_2">
+          <input type="text" class="otp-input h-16 w-16 text-2xl font-bold text-center border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-lg transition-all duration-200 mx-1" maxlength="1" name="otp_3">
+          <input type="text" class="otp-input h-16 w-16 text-2xl font-bold text-center border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-lg transition-all duration-200 mx-1" maxlength="1" name="otp_4">
+          <input type="text" class="otp-input h-16 w-16 text-2xl font-bold text-center border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-lg transition-all duration-200 mx-1" maxlength="1" name="otp_5">
+        </div>
+        <input type="hidden" id="email" name="email">
+      </div>
+      
+      <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-lg">
+        Vérifier le code
+      </button>
+    </form>
+    
+    <div class="text-center pt-6 border-t border-gray-200 dark:border-gray-700">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Problème avec l'email ? <a href="/auth/register/" class="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 transition">Réessayer l'inscription</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+let countdownTimer;
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Get email from URL or localStorage
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get('email') || localStorage.getItem('pending_email');
+  if (email) {
+    document.getElementById('email').value = email;
+    document.getElementById('email-display').textContent = email;
+    localStorage.removeItem('pending_email');
+  }
+  
+  setupOTPInputs();
+  startCountdown();
+  
+  const form = document.getElementById('otp-form');
+  form.addEventListener('submit', handleOTPSubmit);
+});
+
+function setupOTPInputs() {
+  const inputs = document.querySelectorAll('.otp-input');
+  
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      if (e.data && index < 5) {
+        inputs[index + 1].focus();
+      }
+      input.classList.add('ring-2', 'ring-emerald-500/50');
+      setTimeout(() => input.classList.remove('ring-2', 'ring-emerald-500/50'), 200);
+    });
+    
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+    
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const paste = (e.clipboardData || window.clipboardData).getData('text');
+      if (paste.length === 6) {
+        let i = 0;
+        for (const char of paste) {
+          if (i < 6) {
+            inputs[i].value = char;
+            i++;
+          }
+        }
+        inputs[5].focus();
+      }
+    });
+  });
+  
+  inputs[0].focus();
+}
+
+async function handleOTPSubmit(e) {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const otpInputs = document.querySelectorAll('.otp-input');
+  const otpCode = Array.from(otpInputs).map(input => input.value).join('');
+  
+  if (otpCode.length !== 6 || !/^\d{6}$/.test(otpCode)) {
+    cvApp.showToast('Veuillez entrer un code à 6 chiffres valide.', 'error');
+    return;
+  }
+  
+  cvApp.showLoading();
+  
+  try {
+    const formData = { email, otp_code: otpCode };
+    await cvApp.verifyOTP(formData);
+  } catch (error) {
+    cvApp.showToast(error.message || 'Code invalide ou expiré.', 'error');
+    otpInputs[0].focus();
+    otpInputs.forEach(input => input.value = '');
+  } finally {
+    cvApp.hideLoading();
+  }
+}
+
+function startCountdown() {
+  let timeLeft = 600; // 10 minutes
+  
+  countdownTimer = setInterval(() => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('countdown').textContent = 
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (timeLeft <= 0) {
+      clearInterval(countdownTimer);
+      document.getElementById('countdown').textContent = 'Expiré';
+    }
+    timeLeft--;
+  }, 1000);
+}
+
+async function resendOTP() {
+  const email = document.getElementById('email').value;
+  if (!email) return;
+  
+  cvApp.showLoading();
+  try {
+    const response = await cvApp.apiPost('auth/request-otp/', { email });
+    cvApp.showToast('Nouveau code envoyé !', 'success');
+    startCountdown(); // Reset timer
+  } catch (error) {
+    cvApp.showToast(error.message, 'error');
+  } finally {
+    cvApp.hideLoading();
+  }
+}
+</script>
+{% endblock %}

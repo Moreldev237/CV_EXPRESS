@@ -24,7 +24,8 @@ def send_push_notification_task(user_id, title, message, data=None):
     try:
         user = User.objects.get(pk=user_id)
         # Simulation de l'envoi (Ici on utiliserait FCMDevice.send_message)
-        print(f"DEBUG: Push envoyé à {user.email}: {title}")
+        logger = logging.getLogger(__name__)
+        logger.info(f"Push notification sent to {user.email}: {title}")
         return True
     except User.DoesNotExist:
         return False

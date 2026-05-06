@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inscription - CV Express{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 to-emerald-50 dark:from-gray-900 dark:to-gray-800">
+  <div class="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
+    <div>
+      <div class="mx-auto h-16 w-16 bg-gradient-to-r from-primary-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+        </svg>
+      </div>
+      <h2 class="text-center text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        Créez votre compte
+      </h2>
+      <p class="text-center text-gray-600 dark:text-gray-400 text-lg">
+        Rejoignez CV Express dès aujourd'hui. Gratuit pour commencer.
+      </p>
+    </div>
+    
+    <form id="register-form" class="auth-form space-y-6">
+      <div>
+        <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          Adresse e-mail
+        </label>
+        <input type="email" id="email" name="email" required 
+               class="auth-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500" 
+               placeholder="votre@email.com"
+               autocomplete="email">
+      </div>
+      
+      <div>
+        <label for="password1" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          Mot de passe
+        </label>
+        <input type="password" id="password1" name="password1" required minlength="8"
+               class="auth-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500" 
+               placeholder="Au moins 8 caractères">
+      </div>
+      
+      <div>
+        <label for="password2" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          Confirmez le mot de passe
+        </label>
+        <input type="password" id="password2" name="password2" required 
+               class="auth-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500" 
+               placeholder="Répétez votre mot de passe">
+      </div>
+      
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <input id="terms" name="terms" type="checkbox" required class="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500">
+        </div>
+        <div class="ml-3 text-sm">
+          <label for="terms" class="font-medium text-gray-900 dark:text-gray-300">
+            J'accepte les <a href="#" class="text-primary-600 hover:text-primary-700 dark:text-primary-400">conditions d'utilisation</a> et la <a href="#" class="text-primary-600 hover:text-primary-700 dark:text-primary-400">politique de confidentialité</a>
+          </label>
+        </div>
+      </div>
+      
+      <button type="submit" id="register-btn" class="w-full btn-primary text-lg py-4 font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+        <span class="btn-text">S'inscrire gratuitement</span>
+        <span class="btn-loading hidden flex items-center justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Création du compte...
+        </span>
+      </button>
+    </form>
+    
+    <div class="text-center">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Déjà un compte ? <a href="/auth/login/" class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-700 transition">Se connecter</a>
+      </p>
+    </div>
+    
+    <div class="text-xs text-gray-400 text-center">
+      En vous inscrivant, vous acceptez nos conditions. Nous respectons votre vie privée.
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('register-form');
+  const btn = document.getElementById('register-btn');
+  
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btnText = btn.querySelector('.btn-text');
+    const btnLoading = btn.querySelector('.btn-loading');
+    
+    // Client validation
+    const password1 = document.getElementById('password1').value;
+    const password2 = document.getElementById('password2').value;
+    
+    if (password1 !== password2) {
+      cvApp.showToast('Les mots de passe ne correspondent pas.', 'error');
+      return;
+    }
+    
+    if (password1.length < 8) {
+      cvApp.showToast('Le mot de passe doit faire au moins 8 caractères.', 'error');
+      return;
+    }
+    
+    btnText.classList.add('hidden');
+    btnLoading.classList.remove('hidden');
+    btn.disabled = true;
+    
+    const formData = Object.fromEntries(new FormData(form));
+    
+    try {
+      await cvApp.registerUser(formData);
+    } catch (error) {
+      console.error('Registration error:', error);
+    } finally {
+      btnText.classList.remove('hidden');
+      btnLoading.classList.add('hidden');
+      btn.disabled = false;
+    }
+  });
+});
+</script>
+
+<style>
+.auth-input {
+  @apply appearance-none block w-full px-3 py-2 border rounded-xl placeholder-gray-500 
+         focus:outline-none focus:ring-primary-500 focus:border-primary-500 
+         transition duration-200 ease-in-out sm:text-sm bg-white dark:bg-gray-700;
+}
+.auth-input:focus {
+  @apply ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-gray-800 shadow-lg;
+}
+</style>
+{% endblock %}

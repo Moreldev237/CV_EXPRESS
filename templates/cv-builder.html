@@ -1,256 +1,581 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}CV Builder - CV Express{% endblock %}
+{% block title %}{% if cv_id %}Modifier{% else %}Nouveau{% endif %} CV - CV Express{% endblock %}
 
 {% block content %}
-<div class="bg-gray-100 min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="mb-8 flex justify-between items-center">
-            <h1 class="text-4xl font-bold text-gray-800">Créateur de CV</h1>
-            <div class="space-x-2">
-                <button onclick="saveDraft()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition">
-                    <i class="fas fa-save mr-2"></i>Sauvegarder
-                </button>
-                <button onclick="exportCV('pdf')" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                    <i class="fas fa-file-pdf mr-2"></i>PDF
-                </button>
-                <button onclick="exportCV('docx')" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                    <i class="fas fa-file-word mr-2"></i>DOCX
-                </button>
-            </div>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-0">
+  <div class="flex h-screen">
+    
+    <!-- Sidebar Preview (30%) -->
+    <div class="w-full md:w-1/3 lg:w-2/5 xl:w-1/3 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden flex flex-col">
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+            <svg class="w-6 h-6 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Prévisualisation
+            <span class="ml-2 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full">Live</span>
+          </h2>
+          <div class="flex space-x-2">
+            <select id="template-select" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+              <option>Template Classique</option>
+            </select>
+            <button onclick="togglePreviewMode()" class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
+              <svg id="preview-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+              </svg>
+            </button>
+          </div>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Formulaire (Gauche) -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <!-- Tabs -->
-                    <div class="flex border-b border-gray-200 mb-6 overflow-x-auto">
-                        <button class="py-2 px-4 border-b-2 border-blue-600 font-bold text-blue-600 whitespace-nowrap tab-btn" data-tab="personal">
-                            <i class="fas fa-user mr-1"></i>Personnel
-                        </button>
-                        <button class="py-2 px-4 text-gray-600 hover:text-gray-800 whitespace-nowrap tab-btn" data-tab="experience">
-                            <i class="fas fa-briefcase mr-1"></i>Expérience
-                        </button>
-                        <button class="py-2 px-4 text-gray-600 hover:text-gray-800 whitespace-nowrap tab-btn" data-tab="education">
-                            <i class="fas fa-graduation-cap mr-1"></i>Études
-                        </button>
-                        <button class="py-2 px-4 text-gray-600 hover:text-gray-800 whitespace-nowrap tab-btn" data-tab="skills">
-                            <i class="fas fa-star mr-1"></i>Compétences
-                        </button>
-                    </div>
-
-                    <!-- Personal Info -->
-                    <div id="personal" class="tab-content">
-                        <h3 class="text-lg font-bold mb-4 text-gray-800">Informations Personnelles</h3>
-                        
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium mb-2">Nom Complet</label>
-                            <input type="text" id="fullname" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="Jean Dupont">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium mb-2">Titre Professionnel</label>
-                            <input type="text" id="title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="Développeur Web">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium mb-2">Email</label>
-                            <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium mb-2">Téléphone</label>
-                            <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium mb-2">Localité</label>
-                            <input type="text" id="location" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="Paris, France">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium mb-2">Bio / Profil</label>
-                            <textarea id="bio" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="Décrivez votre profil professionnel..."></textarea>
-                        </div>
-
-                        <button onclick="useAIAssistant('bio')" class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition font-medium">
-                            <i class="fas fa-magic mr-2"></i>Générer avec l'IA
-                        </button>
-                    </div>
-
-                    <!-- Experience -->
-                    <div id="experience" class="tab-content hidden">
-                        <h3 class="text-lg font-bold mb-4 text-gray-800">Expérience Professionnelle</h3>
-                        <div id="experiences-list"></div>
-                        <button onclick="addExperience()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium mt-4">
-                            <i class="fas fa-plus mr-2"></i>Ajouter une expérience
-                        </button>
-                    </div>
-
-                    <!-- Education -->
-                    <div id="education" class="tab-content hidden">
-                        <h3 class="text-lg font-bold mb-4 text-gray-800">Formation</h3>
-                        <div id="educations-list"></div>
-                        <button onclick="addEducation()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium mt-4">
-                            <i class="fas fa-plus mr-2"></i>Ajouter une formation
-                        </button>
-                    </div>
-
-                    <!-- Skills -->
-                    <div id="skills" class="tab-content hidden">
-                        <h3 class="text-lg font-bold mb-4 text-gray-800">Compétences</h3>
-                        <div id="skills-list"></div>
-                        <button onclick="addSkill()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium mt-4">
-                            <i class="fas fa-plus mr-2"></i>Ajouter une compétence
-                        </button>
-                    </div>
-                </div>
+        <div id="preview-container" class="flex-1 p-6 overflow-auto bg-gray-50 dark:bg-gray-900/50 rounded-xl shadow-inner">
+          <!-- Dynamic CV preview -->
+          <div class="animate-pulse space-y-4">
+            <div class="h-32 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-xl"></div>
+            <div class="space-y-3">
+              <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             </div>
-
-            <!-- Aperçu (Droite) -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-lg shadow-lg p-8 sticky top-4" id="cv-preview">
-                    <!-- Template Preview -->
-                    <div class="text-center border-b-2 border-gray-300 pb-6 mb-6">
-                        <h1 class="text-4xl font-bold text-gray-800" id="preview-fullname">Jean Dupont</h1>
-                        <p class="text-xl text-blue-600 font-bold" id="preview-title">Développeur Web</p>
-                        <p class="text-gray-600" id="preview-location">Paris, France</p>
-                        <div class="flex justify-center space-x-4 mt-2 text-gray-600">
-                            <span id="preview-email">email@example.com</span>
-                            <span id="preview-phone">+33 1 23 45 67 89</span>
-                        </div>
-                    </div>
-
-                    <!-- Bio -->
-                    <div class="mb-6">
-                        <h2 class="text-xl font-bold text-gray-800 mb-2 border-b border-gray-300 pb-2">Profil</h2>
-                        <p class="text-gray-600 text-sm" id="preview-bio">Décrivez votre profil professionnel...</p>
-                    </div>
-
-                    <!-- Experiences -->
-                    <div class="mb-6" id="preview-experience-section" style="display:none;">
-                        <h2 class="text-xl font-bold text-gray-800 mb-2 border-b border-gray-300 pb-2">Expérience Professionnelle</h2>
-                        <div id="preview-experiences"></div>
-                    </div>
-
-                    <!-- Education -->
-                    <div class="mb-6" id="preview-education-section" style="display:none;">
-                        <h2 class="text-xl font-bold text-gray-800 mb-2 border-b border-gray-300 pb-2">Formation</h2>
-                        <div id="preview-educations"></div>
-                    </div>
-
-                    <!-- Skills -->
-                    <div id="preview-skills-section" style="display:none;">
-                        <h2 class="text-xl font-bold text-gray-800 mb-2 border-b border-gray-300 pb-2">Compétences</h2>
-                        <div class="flex flex-wrap gap-2" id="preview-skills"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="h-20 bg-gray-100 dark:bg-gray-800 rounded-xl mt-8"></div>
+          </div>
         </div>
+      </div>
+      
+      <!-- Actions Toolbar -->
+      <div class="p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col sm:flex-row gap-4">
+        <button onclick="saveCV()" class="flex-1 btn-primary py-4 font-bold rounded-xl shadow-xl hover:shadow-2xl">
+          💾 Sauvegarder
+        </button>
+        <button onclick="exportPDF()" class="btn-success py-4 px-6 font-bold rounded-xl shadow-xl hover:shadow-2xl flex items-center justify-center" id="export-pdf-btn" disabled>
+          📄 Exporter PDF
+        </button>
+        <button onclick="deleteCV()" class="bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900/50 dark:text-red-200 dark:hover:bg-red-800 py-4 px-6 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-colors duration-200" id="delete-btn" style="display: none;">
+          🗑️ Supprimer
+        </button>
+      </div>
     </div>
+    
+    <!-- Main Editor (70%) -->
+    <div class="flex-1 overflow-hidden flex flex-col">
+      
+      <!-- Editor Header -->
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <input type="text" id="cv-title" placeholder="Titre de votre CV" 
+                   class="w-full lg:w-96 text-2xl font-bold text-gray-900 dark:text-white bg-transparent border-none focus:ring-0 p-0 pr-12 resize-none"
+                   maxlength="100">
+            <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <span>Template: <span id="current-template">Classique</span></span>
+              <span>Sections: <span id="sections-count">0</span></span>
+              <span>Dernière sauve: <span id="last-saved">--</span></span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <button onclick="addSection('experience')" class="px-6 py-2 bg-emerald-100 text-emerald-800 font-semibold rounded-xl hover:bg-emerald-200 transition flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Ajouter
+            </button>
+            <div class="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+              <button class="tab-btn active px-4 py-2 rounded-lg font-semibold text-sm transition" data-tab="info">Infos</button>
+              <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm transition" data-tab="experience">Expériences</button>
+              <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm transition" data-tab="education">Formations</button>
+              <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm transition" data-tab="skills">Compétences</button>
+              <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm transition" data-tab="languages">Langues</button>
+              <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm transition" data-tab="projects">Projets</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tab Content -->
+      <div class="flex-1 overflow-auto p-6">
+        <div id="tab-contents">
+          
+          <!-- Info Tab -->
+          <div id="info-tab" class="tab-content active space-y-6">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Résumé professionnel</label>
+              <textarea id="cv-summary" rows="6" 
+                        class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm resize-vertical bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Décrivez votre parcours en 3-4 lignes..."></textarea>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Téléphone</label>
+                <input type="tel" id="phone" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm">
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">LinkedIn</label>
+                <input type="url" id="linkedin" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm">
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Localisation</label>
+                <input type="text" id="location" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm">
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Site web</label>
+                <input type="url" id="website" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Experiences Tab -->
+          <div id="experience-tab" class="tab-content space-y-4">
+            <div id="experiences-list" class="space-y-4">
+              <!-- Dynamic experiences -->
+            </div>
+            <button onclick="showSectionModal('experience')" class="w-full btn-primary py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Ajouter une expérience
+            </button>
+          </div>
+          
+          <!-- Similar for other tabs -->
+          <div id="education-tab" class="tab-content space-y-4">
+            <div id="educations-list" class="space-y-4"></div>
+            <button onclick="showSectionModal('education')" class="w-full btn-primary py-4 rounded-xl font-bold">Ajouter une formation</button>
+          </div>
+          
+          <div id="skills-tab" class="tab-content space-y-4">
+            <div id="skills-list" class="space-y-4"></div>
+            <button onclick="showSectionModal('skill')" class="w-full btn-primary py-4 rounded-xl font-bold">Ajouter une compétence</button>
+          </div>
+          
+          <div id="languages-tab" class="tab-content space-y-4">
+            <div id="languages-list" class="space-y-4"></div>
+            <button onclick="showSectionModal('language')" class="w-full btn-primary py-4 rounded-xl font-bold">Ajouter une langue</button>
+          </div>
+          
+          <div id="projects-tab" class="tab-content space-y-4">
+            <div id="projects-list" class="space-y-4"></div>
+            <button onclick="showSectionModal('project')" class="w-full btn-primary py-4 rounded-xl font-bold">Ajouter un projet</button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Section Modal -->
+  <div id="section-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="flex items-center justify-between mb-8">
+        <h3 id="modal-title" class="text-2xl font-bold text-gray-900 dark:text-white">Ajouter expérience</h3>
+        <button onclick="hideSectionModal()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <form id="section-form" class="space-y-6">
+        <!-- Dynamic form fields -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold mb-2">Titre du poste</label>
+            <input type="text" name="title" class="form-input" required>
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-2">Entreprise</label>
+            <input type="text" name="company" class="form-input" required>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold mb-2">Date début</label>
+            <input type="date" name="start_date" class="form-input">
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-2">Date fin</label>
+            <input type="date" name="end_date" class="form-input">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-bold mb-2">Description</label>
+          <textarea name="description" rows="4" class="form-input" placeholder="Détaillez vos responsabilités et réalisations..."></textarea>
+        </div>
+        <div class="flex gap-4 pt-4">
+          <button type="submit" class="flex-1 btn-primary py-3 font-bold rounded-xl">Sauvegarder</button>
+          <button type="button" onclick="hideSectionModal()" class="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white py-3 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script>
-    // Tab management
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.dataset.tab;
-            
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            
-            // Show selected tab
-            document.getElementById(tabName).classList.remove('hidden');
-            
-            // Update buttons
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('border-blue-600', 'text-blue-600', 'font-bold');
-                b.classList.add('text-gray-600');
-            });
-            this.classList.add('border-blue-600', 'text-blue-600', 'font-bold');
-            this.classList.remove('text-gray-600');
-        });
+// CV Builder main logic
+let currentCV = null;
+let cvId = {{ cv_id|default:"null" }};
+let isNewCV = !cvId;
+let sectionType = '';
+let editingSectionId = null;
+
+document.addEventListener('DOMContentLoaded', initCVBuilder);
+
+async function initCVBuilder() {
+  setupTabs();
+  setupAutoSave();
+  
+  if (isNewCV) {
+    // Create new CV
+    try {
+      currentCV = await cvApp.apiPost('cvs/', { title: 'Nouveau CV' });
+      cvId = currentCV.id;
+      history.replaceState(null, '', `/cv-builder/${cvId}/`);
+      isNewCV = false;
+      document.getElementById('delete-btn').style.display = 'block';
+    } catch (error) {
+      cvApp.showToast('Erreur création CV', 'error');
+      return;
+    }
+  } else {
+    // Load existing
+    currentCV = await cvApp.apiGet(`cvs/${cvId}/`);
+  }
+  
+  loadTemplates();
+  loadAllSections();
+  updatePreview();
+  document.title = currentCV.title + ' - CV Builder';
+}
+
+function setupTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const tab = e.target.dataset.tab;
+      switchTab(tab);
     });
-
-    // Real-time preview update
-    const inputs = ['fullname', 'title', 'email', 'phone', 'location', 'bio'];
-    inputs.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('input', updatePreview);
-        }
-    });
-
-    function updatePreview() {
-        document.getElementById('preview-fullname').textContent = document.getElementById('fullname').value || 'Nom Complet';
-        document.getElementById('preview-title').textContent = document.getElementById('title').value || 'Titre Professionnel';
-        document.getElementById('preview-email').textContent = document.getElementById('email').value || 'email@example.com';
-        document.getElementById('preview-phone').textContent = document.getElementById('phone').value || '+33 1 23 45 67 89';
-        document.getElementById('preview-location').textContent = document.getElementById('location').value || 'Localité';
-        document.getElementById('preview-bio').textContent = document.getElementById('bio').value || 'Bio';
+  });
+  
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const tabs = ['info', 'experience', 'education', 'skills', 'languages', 'projects'];
+      const current = document.querySelector('.tab-btn.active').dataset.tab;
+      const nextIndex = (tabs.indexOf(current) + 1) % tabs.length;
+      switchTab(tabs[nextIndex]);
     }
+  });
+}
 
-    function addExperience() {
-        const html = `
-            <div class="bg-gray-100 p-4 rounded mb-4">
-                <input type="text" placeholder="Titre du poste" class="w-full px-3 py-2 mb-2 border border-gray-300 rounded">
-                <input type="text" placeholder="Entreprise" class="w-full px-3 py-2 mb-2 border border-gray-300 rounded">
-                <div class="grid grid-cols-2 gap-2 mb-2">
-                    <input type="date" class="px-3 py-2 border border-gray-300 rounded">
-                    <input type="date" class="px-3 py-2 border border-gray-300 rounded">
-                </div>
-                <textarea rows="2" placeholder="Description" class="w-full px-3 py-2 border border-gray-300 rounded"></textarea>
-                <button onclick="this.parentElement.remove()" class="mt-2 text-red-600 hover:text-red-800">Supprimer</button>
-            </div>
-        `;
-        document.getElementById('experiences-list').insertAdjacentHTML('beforeend', html);
-    }
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'bg-primary-500', 'text-white'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active', 'bg-primary-500', 'text-white');
+  document.getElementById(`${tab}-tab`).classList.add('active');
+}
 
-    function addEducation() {
-        const html = `
-            <div class="bg-gray-100 p-4 rounded mb-4">
-                <input type="text" placeholder="Diplôme" class="w-full px-3 py-2 mb-2 border border-gray-300 rounded">
-                <input type="text" placeholder="École/Université" class="w-full px-3 py-2 mb-2 border border-gray-300 rounded">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="date" class="px-3 py-2 border border-gray-300 rounded">
-                    <input type="date" class="px-3 py-2 border border-gray-300 rounded">
-                </div>
-                <button onclick="this.parentElement.remove()" class="mt-2 text-red-600 hover:text-red-800">Supprimer</button>
-            </div>
-        `;
-        document.getElementById('educations-list').insertAdjacentHTML('beforeend', html);
-    }
+async function loadTemplates() {
+  const templates = await cvApp.apiGet('templates/');
+  const select = document.getElementById('template-select');
+  select.innerHTML = templates.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  select.onchange = updatePreview;
+}
 
-    function addSkill() {
-        const html = `
-            <div class="flex gap-2 mb-2">
-                <input type="text" placeholder="Compétence" class="flex-1 px-3 py-2 border border-gray-300 rounded">
-                <select class="px-3 py-2 border border-gray-300 rounded">
-                    <option>Débutant</option>
-                    <option>Intermédiaire</option>
-                    <option>Avancé</option>
-                    <option>Expert</option>
-                </select>
-                <button onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-800">X</button>
-            </div>
-        `;
-        document.getElementById('skills-list').insertAdjacentHTML('beforeend', html);
-    }
+async function loadAllSections() {
+  const sections = {
+    experience: await cvApp.apiGet(`cvs/${cvId}/experiences/`),
+    education: await cvApp.apiGet(`cvs/${cvId}/educations/`),
+    skill: await cvApp.apiGet(`cvs/${cvId}/skills/`),
+    language: await cvApp.apiGet(`cvs/${cvId}/languages/`),
+    project: await cvApp.apiGet(`cvs/${cvId}/projects/`),
+  };
+  
+  Object.entries(sections).forEach(([type, items]) => {
+    renderSectionList(type, items);
+  });
+  
+  updateSectionsCount();
+}
 
-    async function useAIAssistant(field) {
-        alert('Fonctionnalité IA - Bientôt disponible!');
-    }
+function renderSectionList(type, items) {
+  const container = document.getElementById(`${type}s-list`);
+  container.innerHTML = '';
+  
+  items.forEach(item => {
+    const card = createSectionCard(type, item);
+    container.appendChild(card);
+  });
+}
 
-    async function saveDraft() {
-        alert('CV sauvegardé!');
-    }
+function createSectionCard(type, item) {
+  const card = document.createElement('div');
+  card.className = 'group p-6 border border-gray-200 dark:border-gray-600 rounded-2xl hover:shadow-xl hover:border-primary-300 transition-all duration-300 cursor-pointer bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-gray-700';
+  
+  card.innerHTML = `
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h4 class="font-bold text-lg text-gray-900 dark:text-white line-clamp-1">${item.title || item.name || item.degree}</h4>
+        <p class="text-sm text-gray-600 dark:text-gray-400">${item.company || item.skill_level || item.proficiency + '%'}</p>
+      </div>
+      <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition">
+        <button onclick="editSection('${type}', ${item.id}); event.stopPropagation();" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">
+          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </button>
+        <button onclick="deleteSection('${type}', ${item.id}); event.stopPropagation();" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-xl text-red-500">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+  
+  return card;
+}
 
-    async function exportCV(format) {
-        alert(`Export en ${format.toUpperCase()} - Bientôt disponible!`);
+function showSectionModal(type) {
+  sectionType = type;
+  editingSectionId = null;
+  document.getElementById('modal-title').textContent = `Ajouter ${getSectionLabel(type)}`;
+  loadSectionForm(type);
+  document.getElementById('section-modal').classList.remove('hidden');
+}
+
+function editSection(type, id) {
+  sectionType = type;
+  editingSectionId = id;
+  document.getElementById('modal-title').textContent = `Modifier ${getSectionLabel(type)}`;
+  loadSectionForm(type, id);
+  document.getElementById('section-modal').classList.remove('hidden');
+}
+
+function hideSectionModal() {
+  document.getElementById('section-modal').classList.add('hidden');
+  document.getElementById('section-form').reset();
+}
+
+function getSectionLabel(type) {
+  const labels = {
+    experience: 'expérience',
+    education: 'formation',
+    skill: 'compétence',
+    language: 'langue',
+    project: 'projet'
+  };
+  return labels[type] || type;
+}
+
+async function loadSectionForm(type, id = null) {
+  const form = document.getElementById('section-form');
+  form.innerHTML = ''; // Clear
+  
+  if (id) {
+    const item = await cvApp.apiGet(`cvs/${cvId}/${type}s/${id}/`);
+    // Populate form with item data
+    console.log('Loading section:', item);
+  }
+  
+  // Dynamic form based on type
+  const fields = getSectionFields(type);
+  fields.forEach(field => {
+    const input = createFormField(field);
+    form.appendChild(input);
+  });
+  
+  form.onsubmit = (e) => handleSectionSubmit(e);
+}
+
+function getSectionFields(type) {
+  const fields = {
+    experience: [
+      { name: 'title', label: 'Titre du poste', type: 'text' },
+      { name: 'company', label: 'Entreprise', type: 'text' },
+      { name: 'start_date', label: 'Date début', type: 'date' },
+      { name: 'end_date', label: 'Date fin', type: 'date' },
+      { name: 'description', label: 'Description', type: 'textarea' }
+    ],
+    education: [
+      { name: 'degree', label: 'Diplôme', type: 'text' },
+      { name: 'institution', label: 'Établissement', type: 'text' },
+      { name: 'start_date', label: 'Date début', type: 'date' },
+      { name: 'end_date', label: 'Date fin', type: 'date' },
+      { name: 'description', label: 'Description', type: 'textarea' }
+    ],
+    // Add others...
+  };
+  return fields[type] || [];
+}
+
+function createFormField(field) {
+  const div = document.createElement('div');
+  div.className = 'space-y-2';
+  
+  div.innerHTML = `
+    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">${field.label}</label>
+    <input type="${field.type}" name="${field.name}" class="form-input w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 shadow-sm" required>
+  `;
+  
+  if (field.type === 'textarea') {
+    div.querySelector('input').outerHTML = `<textarea name="${field.name}" rows="4" class="form-input w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 shadow-sm" placeholder="${field.label}..."></textarea>`;
+  }
+  
+  return div;
+}
+
+async function handleSectionSubmit(e) {
+  e.preventDefault();
+  
+  const formData = Object.fromEntries(new FormData(e.target));
+  
+  try {
+    if (editingSectionId) {
+      await cvApp.apiPut(`cvs/${cvId}/${sectionType}s/${editingSectionId}/`, formData);
+      cvApp.showToast('Section mise à jour !', 'success');
+    } else {
+      await cvApp.apiPost(`cvs/${cvId}/${sectionType}s/`, formData);
+      cvApp.showToast('Section ajoutée !', 'success');
     }
+    
+    loadAllSections();
+    updatePreview();
+    hideSectionModal();
+  } catch (error) {
+    cvApp.showToast('Erreur: ' + error.message, 'error');
+  }
+}
+
+async function deleteSection(type, id) {
+  if (!confirm('Supprimer définitivement ?')) return;
+  
+  try {
+    await cvApp.apiDelete(`cvs/${cvId}/${type}s/${id}/`);
+    cvApp.showToast('Section supprimée.', 'success');
+    loadAllSections();
+    updatePreview();
+  } catch (error) {
+    cvApp.showToast('Erreur suppression', 'error');
+  }
+}
+
+async function saveCV() {
+  const data = {
+    title: document.getElementById('cv-title').value,
+    summary: document.getElementById('cv-summary')?.value,
+    phone: document.getElementById('phone')?.value,
+    linkedin: document.getElementById('linkedin')?.value,
+    location: document.getElementById('location')?.value,
+    website: document.getElementById('website')?.value,
+    template_id: document.getElementById('template-select').value
+  };
+  
+  try {
+    currentCV = await cvApp.apiPut(`cvs/${cvId}/`, data);
+    cvApp.showToast('CV sauvegardé !', 'success');
+    document.getElementById('last-saved').textContent = new Date().toLocaleTimeString();
+  } catch (error) {
+    cvApp.showToast('Erreur sauvegarde', 'error');
+  }
+}
+
+async function exportPDF() {
+  const link = document.createElement('a');
+  link.href = `/api/cvs/${cvId}/export-pdf/`;
+  link.download = `cv-${currentCV.title.replace(/\\s+/g, '_')}.pdf`;
+  link.click();
+}
+
+function updatePreview() {
+  // Simple HTML preview
+  const preview = document.getElementById('preview-container');
+  const templateId = document.getElementById('template-select').value;
+  
+  // Mock data for preview
+  const previewHTML = generatePreviewHTML();
+  preview.innerHTML = previewHTML;
+}
+
+function generatePreviewHTML() {
+  return `
+    <div class="max-w-4xl mx-auto p-8 bg-white shadow-2xl rounded-3xl">
+      <div class="text-center mb-8">
+        <h1 id="preview-title" class="text-4xl font-bold text-gray-900">${document.getElementById('cv-title')?.value || 'Titre CV'}</h1>
+        <p class="text-xl text-gray-600 mt-2">${document.getElementById('cv-summary')?.value || 'Résumé professionnel'}</p>
+      </div>
+      
+      <div id="preview-experiences" class="mb-8">
+        <!-- Dynamic preview sections -->
+      </div>
+      
+      <div class="text-right text-sm text-gray-500">
+        Créé avec CV Express
+      </div>
+    </div>
+  `;
+}
+
+function updateSectionsCount() {
+  const counts = {
+    experience: document.querySelectorAll('#experience-tab .group').length,
+    education: document.querySelectorAll('#education-tab .group').length,
+    // ...
+  };
+  document.getElementById('sections-count').textContent = Object.values(counts).reduce((a, b) => a + b, 0);
+}
+
+function togglePreviewMode() {
+  const icon = document.getElementById('preview-icon');
+  const container = document.getElementById('preview-container');
+  container.classList.toggle('print-preview');
+  icon.classList.toggle('rotate-180');
+}
+
+// Auto-save every 30s
+function setupAutoSave() {
+  setInterval(saveCV, 30000);
+}
+
+// Form inputs update preview
+document.addEventListener('input', debounce(updatePreview, 500));
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 </script>
+
+<style>
+.tab-btn.active {
+  background: linear-gradient(to right, #3b82f6, #10b981);
+  color: white;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+.form-input {
+  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all;
+}
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.print-preview {
+  background: white;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+}
+</style>
 {% endblock %}

@@ -176,7 +176,8 @@ class RequestNewOTPView(APIView):
                 OTP.objects.create(user=user, code=otp_code, expires_at=expires_at)
                 
                 # En production, envoyer l'email ici
-                print(f"DEBUG: Nouveau OTP pour {user.email}: {otp_code}")
+                logger = logging.getLogger(__name__)
+                logger.info(f"New OTP generated for {user.email}: {otp_code}")
                 
                 return Response({'message': 'Un nouveau code OTP a été envoyé par e-mail.'}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
