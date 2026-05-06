@@ -224,33 +224,39 @@ async function initCVBuilder() {
   setupTabs();
   setupAutoSave();
   
+  // éviter auto-save en cours de chargement
+  isDirty = false;
+  isSaving = false;
+  
   if (isNewCV) {
     // Create new CV
     try {
-      currentCV = await cvApp.apiPost('cvs/', { title: 'Nouveau CV' });
+      currentCV = await cvApp.apiPost('cv/', { title: 'Nouveau CV' });
       cvId = currentCV.id;
       history.replaceState(null, '', `/cv-builder/${cvId}/`);
       isNewCV = false;
       document.getElementById('delete-btn').style.display = 'block';
+      hydrateInfoFields();
     } catch (error) {
       cvApp.showToast('Erreur création CV', 'error');
       return;
     }
   } else {
+    document.getElementById('delete-btn').style.display = 'block';
     // Load existing
-    currentCV = await cvApp.apiGet(`cvs/${cvId}/`);
+    currentCV = await cvApp.apiGet(`cv/${cvId}/`);
   }
   
   loadTemplates();
   loadAllSections();
   updatePreview();
-  document.title = currentCV.title + ' - CV Builder';
+  hydrateInfoFields(); // Call after currentCV is loaded
 }
 
 function setupTabs() {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const tab = e.target.dataset.tab;
+      const tab = e.currentTarget.dataset.tab;
       switchTab(tab);
     });
   });
@@ -267,6 +273,18 @@ function setupTabs() {
   });
 }
 
+function hydrateInfoFields() {
+  if (!currentCV) return;
+
+  document.getElementById('cv-title').value = currentCV.title || '';
+  document.getElementById('cv-summary').value = currentCV.summary || '';
+  document.getElementById('phone').value = currentCV.phone || '';
+  document.getElementById('linkedin').value = currentCV.linkedin || '';
+  document.getElementById('location').value = currentCV.location || '';
+  document.getElementById('website').value = currentCV.website || '';
+  document.getElementById('template-select').value = currentCV.template_id || '';
+}
+
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'bg-primary-500', 'text-white'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -279,23 +297,43 @@ async function loadTemplates() {
   const templates = await cvApp.apiGet('templates/');
   const select = document.getElementById('template-select');
   select.innerHTML = templates.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-  select.onchange = updatePreview;
+
+  select.onchange = () => {
+    const currentTemplateLabel = templates.find(t => String(t.id) === String(select.value))?.name;
+    document.getElementById('current-template').textContent = currentTemplateLabel || 'Classique';
+    updatePreview();
+  };
+
+  const forced = select.dataset.selectedTemplateId;
+  if (forced) select.value = forced;
+
+  const selectedId = select.value;
+  const selectedTemplate = templates.find(t => String(t.id) === String(selectedId));
+  document.getElementById('current-template').textContent = selectedTemplate?.name || 'Classique';
 }
 
 async function loadAllSections() {
   const sections = {
-    experience: await cvApp.apiGet(`cvs/${cvId}/experiences/`),
-    education: await cvApp.apiGet(`cvs/${cvId}/educations/`),
-    skill: await cvApp.apiGet(`cvs/${cvId}/skills/`),
-    language: await cvApp.apiGet(`cvs/${cvId}/languages/`),
-    project: await cvApp.apiGet(`cvs/${cvId}/projects/`),
+    experience: await cvApp.apiGet(`cv/${cvId}/experiences/`),
+    education: await cvApp.apiGet(`cv/${cvId}/educations/`),
+    skill: await cvApp.apiGet(`cv/${cvId}/skills/`),
+    language: await cvApp.apiGet(`cv/${cvId}/languages/`),
+    project: await cvApp.apiGet(`cv/${cvId}/projects/`),
   };
   
   Object.entries(sections).forEach(([type, items]) => {
+    // Attach data to currentCV for updatePreview()
+    if (type === 'experience') currentCV.experiences = items;
+    if (type === 'education') currentCV.educations = items;
+    if (type === 'skill') currentCV.skills = items;
+    if (type === 'language') currentCV.languages = items;
+    if (type === 'project') currentCV.projects = items;
+    
     renderSectionList(type, items);
   });
   
   updateSectionsCount();
+  updatePreview();
 }
 
 function renderSectionList(type, items) {
@@ -370,41 +408,63 @@ function getSectionLabel(type) {
 
 async function loadSectionForm(type, id = null) {
   const form = document.getElementById('section-form');
-  form.innerHTML = ''; // Clear
-  
+  form.innerHTML = '';
+
+  let item = null;
   if (id) {
-    const item = await cvApp.apiGet(`cvs/${cvId}/${type}s/${id}/`);
-    // Populate form with item data
-    console.log('Loading section:', item);
+    item = await cvApp.apiGet(`cvs/${cvId}/${type}s/${id}/`);
   }
-  
-  // Dynamic form based on type
+
   const fields = getSectionFields(type);
   fields.forEach(field => {
-    const input = createFormField(field);
-    form.appendChild(input);
+    const fieldEl = createFormField(field);
+    const input = fieldEl.querySelector(`[name="${field.name}"]`);
+    if (item && input) {
+      const v = item[field.name];
+      if (v !== undefined && v !== null) input.value = v;
+
+      // If backend returns null/empty for textarea, keep empty.
+      if (field.type === 'textarea' && v !== undefined && v !== null) {
+        input.value = v;
+      }
+    }
+    form.appendChild(fieldEl);
   });
-  
+
   form.onsubmit = (e) => handleSectionSubmit(e);
 }
 
 function getSectionFields(type) {
   const fields = {
     experience: [
-      { name: 'title', label: 'Titre du poste', type: 'text' },
-      { name: 'company', label: 'Entreprise', type: 'text' },
-      { name: 'start_date', label: 'Date début', type: 'date' },
-      { name: 'end_date', label: 'Date fin', type: 'date' },
-      { name: 'description', label: 'Description', type: 'textarea' }
+      { name: 'title', label: 'Titre du poste', type: 'text', required: true },
+      { name: 'company', label: 'Entreprise', type: 'text', required: true },
+      { name: 'start_date', label: 'Date début', type: 'date', required: false },
+      { name: 'end_date', label: 'Date fin', type: 'date', required: false },
+      { name: 'description', label: 'Description', type: 'textarea', required: false }
     ],
     education: [
-      { name: 'degree', label: 'Diplôme', type: 'text' },
-      { name: 'institution', label: 'Établissement', type: 'text' },
-      { name: 'start_date', label: 'Date début', type: 'date' },
-      { name: 'end_date', label: 'Date fin', type: 'date' },
-      { name: 'description', label: 'Description', type: 'textarea' }
+      { name: 'degree', label: 'Diplôme', type: 'text', required: true },
+      { name: 'institution', label: 'Établissement', type: 'text', required: true },
+      { name: 'start_date', label: 'Date début', type: 'date', required: false },
+      { name: 'end_date', label: 'Date fin', type: 'date', required: false },
+      { name: 'description', label: 'Description', type: 'textarea', required: false }
     ],
-    // Add others...
+    skill: [
+      { name: 'name', label: 'Compétence', type: 'text', required: true },
+      { name: 'proficiency', label: 'Niveau (%)', type: 'number', required: false },
+      { name: 'description', label: 'Détails', type: 'textarea', required: false }
+    ],
+    language: [
+      { name: 'name', label: 'Langue', type: 'text', required: true },
+      { name: 'proficiency', label: 'Niveau (%)', type: 'number', required: false },
+      { name: 'description', label: 'Détails', type: 'textarea', required: false }
+    ],
+    project: [
+      { name: 'title', label: 'Titre du projet', type: 'text', required: true },
+      { name: 'description', label: 'Description', type: 'textarea', required: false },
+      { name: 'link', label: 'Lien (URL)', type: 'url', required: false }
+    ]
   };
   return fields[type] || [];
 }
@@ -412,16 +472,18 @@ function getSectionFields(type) {
 function createFormField(field) {
   const div = document.createElement('div');
   div.className = 'space-y-2';
-  
+
+  const required = field.required === true;
+  const requiredAttr = required ? 'required' : '';
+
   div.innerHTML = `
-    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">${field.label}</label>
-    <input type="${field.type}" name="${field.name}" class="form-input w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 shadow-sm" required>
+    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">${field.label}</label>
+    ${field.type === 'textarea' 
+      ? `<textarea name="${field.name}" rows="4" class="form-input" placeholder="${field.label}..." ${requiredAttr}></textarea>`
+      : `<input type="${field.type}" name="${field.name}" class="form-input" ${requiredAttr}>`
+    }
   `;
-  
-  if (field.type === 'textarea') {
-    div.querySelector('input').outerHTML = `<textarea name="${field.name}" rows="4" class="form-input w-full p-4 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-primary-500 shadow-sm" placeholder="${field.label}..."></textarea>`;
-  }
-  
+
   return div;
 }
 
@@ -432,10 +494,10 @@ async function handleSectionSubmit(e) {
   
   try {
     if (editingSectionId) {
-      await cvApp.apiPut(`cvs/${cvId}/${sectionType}s/${editingSectionId}/`, formData);
+      await cvApp.apiPut(`cv/${cvId}/${sectionType}s/${editingSectionId}/`, formData);
       cvApp.showToast('Section mise à jour !', 'success');
     } else {
-      await cvApp.apiPost(`cvs/${cvId}/${sectionType}s/`, formData);
+      await cvApp.apiPost(`cv/${cvId}/${sectionType}s/`, formData);
       cvApp.showToast('Section ajoutée !', 'success');
     }
     
@@ -451,7 +513,7 @@ async function deleteSection(type, id) {
   if (!confirm('Supprimer définitivement ?')) return;
   
   try {
-    await cvApp.apiDelete(`cvs/${cvId}/${type}s/${id}/`);
+    await cvApp.apiDelete(`cv/${cvId}/${type}s/${id}/`);
     cvApp.showToast('Section supprimée.', 'success');
     loadAllSections();
     updatePreview();
@@ -472,7 +534,7 @@ async function saveCV() {
   };
   
   try {
-    currentCV = await cvApp.apiPut(`cvs/${cvId}/`, data);
+    currentCV = await cvApp.apiPut(`cv/${cvId}/`, data);
     cvApp.showToast('CV sauvegardé !', 'success');
     document.getElementById('last-saved').textContent = new Date().toLocaleTimeString();
   } catch (error) {
@@ -482,34 +544,76 @@ async function saveCV() {
 
 async function exportPDF() {
   const link = document.createElement('a');
-  link.href = `/api/cvs/${cvId}/export-pdf/`;
+  link.href = `/api/cv/${cvId}/export/`;
   link.download = `cv-${currentCV.title.replace(/\\s+/g, '_')}.pdf`;
   link.click();
 }
 
 function updatePreview() {
-  // Simple HTML preview
-  const preview = document.getElementById('preview-container');
-  const templateId = document.getElementById('template-select').value;
-  
-  // Mock data for preview
-  const previewHTML = generatePreviewHTML();
-  preview.innerHTML = previewHTML;
+  if (currentCV) { // Only update if currentCV is loaded
+    document.getElementById('preview-container').innerHTML = generatePreviewHTML();
+  }
+}
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (m) => ({
+    '&': '&amp;',
+    '<': '<',
+    '>': '>',
+    '"': '"',
+    "'": '&#039;'
+  })[m]);
 }
 
 function generatePreviewHTML() {
+  const title = currentCV.title || 'Titre CV';
+  const summary = currentCV.summary || 'Résumé professionnel';
+
+  // Use the hydrated currentCV data
+  const experiences = currentCV.experiences?.map(exp => exp.title) || [];
+  const educations = currentCV.educations?.map(edu => edu.degree) || [];
+  const skills = currentCV.skills?.map(skill => skill.name) || [];
+  const languages = currentCV.languages?.map(lang => lang.name) || [];
+  const projects = currentCV.projects?.map(proj => proj.title) || [];
+
+  // Helper to render lists
+  const sectionList = (arr) => arr && arr.length
+    ? `<ul class="space-y-1">${arr.map(x => `<li class="text-sm">${escapeHtml(x)}</li>`).join('')}</ul>`
+    : `<p class="text-sm text-gray-500 dark:text-gray-400">—</p>`;
+
   return `
     <div class="max-w-4xl mx-auto p-8 bg-white shadow-2xl rounded-3xl">
       <div class="text-center mb-8">
-        <h1 id="preview-title" class="text-4xl font-bold text-gray-900">${document.getElementById('cv-title')?.value || 'Titre CV'}</h1>
-        <p class="text-xl text-gray-600 mt-2">${document.getElementById('cv-summary')?.value || 'Résumé professionnel'}</p>
+        <h1 id="preview-title" class="text-4xl font-bold text-gray-900">${escapeHtml(title)}</h1>
+        <p class="text-xl text-gray-600 mt-2">${escapeHtml(summary)}</p>
       </div>
-      
-      <div id="preview-experiences" class="mb-8">
-        <!-- Dynamic preview sections -->
+
+      <div class="space-y-6">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900 mb-3">Expériences</h2>
+          ${sectionList(experiences)}
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-gray-900 mb-3">Formations</h2>
+          ${sectionList(educations)}
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900 mb-3">Compétences</h2>
+            ${sectionList(skills)}
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900 mb-3">Langues</h2>
+            ${sectionList(languages)}
+          </div>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-gray-900 mb-3">Projets</h2>
+          ${sectionList(projects)}
+        </div>
       </div>
-      
-      <div class="text-right text-sm text-gray-500">
+
+      <div class="text-right text-sm text-gray-500 mt-8">
         Créé avec CV Express
       </div>
     </div>
@@ -518,11 +622,14 @@ function generatePreviewHTML() {
 
 function updateSectionsCount() {
   const counts = {
-    experience: document.querySelectorAll('#experience-tab .group').length,
-    education: document.querySelectorAll('#education-tab .group').length,
-    // ...
+    experience: currentCV.experiences ? currentCV.experiences.length : 0,
+    education: currentCV.educations ? currentCV.educations.length : 0,
+    skill: currentCV.skills ? currentCV.skills.length : 0,
+    language: currentCV.languages ? currentCV.languages.length : 0,
+    project: currentCV.projects ? currentCV.projects.length : 0,
   };
-  document.getElementById('sections-count').textContent = Object.values(counts).reduce((a, b) => a + b, 0);
+  const totalSections = Object.values(counts).reduce((a, b) => a + b, 0);
+  document.getElementById('sections-count').textContent = totalSections;
 }
 
 function togglePreviewMode() {
@@ -532,13 +639,45 @@ function togglePreviewMode() {
   icon.classList.toggle('rotate-180');
 }
 
-// Auto-save every 30s
-function setupAutoSave() {
-  setInterval(saveCV, 30000);
+// Auto-save (dirty flag) - évite de spammer le backend
+let isDirty = false;
+let isSaving = false;
+let pendingPreview = null;
+
+function markDirtyAndPreview() {
+  isDirty = true;
+  // update preview rapidement, mais pas à chaque keypress
+  if (pendingPreview) clearTimeout(pendingPreview);
+  pendingPreview = setTimeout(() => updatePreview(), 250);
 }
 
-// Form inputs update preview
-document.addEventListener('input', debounce(updatePreview, 500));
+async function saveCVIfDirty() {
+  if (!isDirty || isSaving) return;
+  isDirty = false;
+  isSaving = true;
+  try {
+    await saveCV();
+    document.getElementById('last-saved').textContent = new Date().toLocaleTimeString();
+  } finally {
+    isSaving = false;
+  }
+}
+
+function setupAutoSave() {
+  setInterval(saveCVIfDirty, 30000);
+}
+
+// Form inputs update preview + dirty flag
+['input','change'].forEach(evt => {
+  document.addEventListener(evt, (e) => {
+    const t = e.target;
+    if (!t || !(t instanceof HTMLElement)) return;
+    if (t.closest('#section-modal')) return; // les submit du modal font déjà updatePreview
+    if (t.id === 'template-select') return; // onchange gère preview
+    markDirtyAndPreview();
+  }, { passive: true });
+});
+
 
 function debounce(func, wait) {
   let timeout;

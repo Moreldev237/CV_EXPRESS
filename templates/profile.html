@@ -1,47 +1,41 @@
-{% load static %}
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Profil - CV Express{% endblock %}
+{% block title %}Mon Profil - CV Express{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto p-4 md:p-6">
-  <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6">
-    <h1 class="text-2xl font-bold mb-6">Votre profil</h1>
-
-    <div class="flex items-center gap-4 mb-6">
-      <img
-        src="{% if user.profile_image and user.profile_image.name != 'default_profile.png' %}{{ user.profile_image.url }}{% else %}{% static 'img/profile.png' %}{% endif %}"
-        alt="Photo de profil"
-        class="w-20 h-20 rounded-full object-cover"
-      />
-
-      <div>
-        <div class="text-lg font-semibold">
-          {{ user.first_name|default:user.email }} {{ user.last_name|default:'' }}
+<div class="max-w-4xl mx-auto py-12 px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-3xl font-bold mb-8">Mon Profil</h2>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <img id="profile-preview" src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" 
+                     class="w-48 h-48 rounded-full mx-auto mb-4 object-cover border-4 border-primary-500">
+                <button onclick="document.getElementById('avatar-input').click()" class="btn-secondary text-sm py-2">Changer la photo</button>
+                <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="uploadAvatar(this)">
+            </div>
+            
+            <div class="md:col-span-2 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-500">Email</label>
+                    <p class="text-lg">{{ user.email }}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-500">Prénom</label>
+                        <p class="text-lg">{{ user.first_name|default:"--" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-500">Nom</label>
+                        <p class="text-lg">{{ user.last_name|default:"--" }}</p>
+                    </div>
+                </div>
+                <div class="pt-6">
+                    <a href="/profile/edit/" class="btn-primary">Modifier mes informations</a>
+                </div>
+            </div>
         </div>
-        <div class="text-gray-500 dark:text-gray-400">{{ user.email }}</div>
-      </div>
     </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-        <div class="text-sm text-gray-500 dark:text-gray-400">Prénom</div>
-        <div class="font-medium">{{ user.first_name|default:'—' }}</div>
-      </div>
-      <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-        <div class="text-sm text-gray-500 dark:text-gray-400">Nom</div>
-        <div class="font-medium">{{ user.last_name|default:'—' }}</div>
-      </div>
-      <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg sm:col-span-2">
-        <div class="text-sm text-gray-500 dark:text-gray-400">ID utilisateur</div>
-        <div class="font-medium">{{ user.id }}</div>
-      </div>
-    </div>
-
-    <div class="mt-6 text-sm text-gray-500 dark:text-gray-400">
-      (Section profil en cours de développement)
-    </div>
-  </div>
 </div>
 {% endblock %}
-

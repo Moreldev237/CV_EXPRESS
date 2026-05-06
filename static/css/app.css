@@ -5,7 +5,9 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom animations */
+/* =========================
+   ANIMATIONS
+========================= */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -21,53 +23,130 @@ html {
   animation: fadeInUp 0.8s ease-out;
 }
 
-/* Glass morphism effect */
+/* Spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Checkmark animations */
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #7ac142;
+  }
+}
+
+/* =========================
+   EFFECTS
+========================= */
+
+/* Glass morphism */
 .glass {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* Custom buttons */
+/* =========================
+   BUTTONS
+========================= */
 .btn-primary {
-  @apply bg-gradient-to-r from-primary-600 to-emerald-600 hover:from-primary-700 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 border-0;
+  background: linear-gradient(to right, #2563eb, #059669);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .btn-secondary {
-  @apply bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl hover:shadow-md transition-all duration-200;
+  background: white;
+  border: 2px solid #e5e7eb;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
 }
 
-.btn-success {
-  @apply bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
+/* Click effect */
+button:active {
+  transform: scale(0.98);
 }
 
-/* Card hover effects */
-.card-hover {
-  @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white dark:hover:bg-gray-800;
-}
-
-/* Section headers */
+/* =========================
+   TEXT & HEADERS
+========================= */
 .section-header {
-  @apply text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-8;
-  background-clip: text;
+  font-size: 1.875rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #2563eb, #059669);
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
-/* Form inputs focus */
-input:focus, textarea:focus, select:focus {
-  @apply ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-gray-800;
+/* =========================
+   FORMS
+========================= */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-color: #3b82f6;
 }
 
-/* Preview iframe */
+/* =========================
+   PREVIEW
+========================= */
 .cv-preview {
-  @apply border-0 w-full h-[80vh] rounded-2xl shadow-2xl bg-white dark:bg-gray-50;
+  border: none;
+  width: 100%;
+  height: 80vh;
+  border-radius: 1rem;
+  background: white;
 }
 
-/* Mobile menu */
+/* =========================
+   MOBILE MENU
+========================= */
 #mobile-menu {
-  @apply md:hidden absolute top-16 right-4 w-64 bg-white dark:bg-gray-800 shadow-xl rounded-2xl py-4 z-50 border;
+  display: none;
+  position: absolute;
+  top: 4rem;
+  right: 1rem;
+  width: 16rem;
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem 0;
+  z-index: 50;
+  border: 1px solid #e5e7eb;
 }
 
-/* Loading spinner */
+/* =========================
+   SPINNER
+========================= */
 .spinner {
   border: 3px solid #f3f4f6;
   border-top: 3px solid #3b82f6;
@@ -77,12 +156,9 @@ input:focus, textarea:focus, select:focus {
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Success checkmark */
+/* =========================
+   SUCCESS CHECKMARK
+========================= */
 .checkmark {
   width: 56px;
   height: 56px;
@@ -93,7 +169,8 @@ input:focus, textarea:focus, select:focus {
   stroke-miterlimit: 10;
   margin: 10% auto;
   box-shadow: inset 0px 0px 0px #7ac142;
-  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  animation: fill 0.4s ease-in-out 0.4s forwards,
+             scale 0.3s ease-in-out 0.9s both;
   background: #7ac142;
 }
 
@@ -104,21 +181,39 @@ input:focus, textarea:focus, select:focus {
   animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
 }
 
-/* Scrollbar */
+/* =========================
+   SCROLLBAR
+========================= */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  background: #f3f4f6;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary-400 hover:bg-primary-500 rounded-full;
+  background: #60a5fa;
+  border-radius: 9999px;
 }
 
-/* Print styles for CV */
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+/* =========================
+   PRINT
+========================= */
 @media print {
-  .no-print { display: none !important; }
-  body { -webkit-print-color-adjust: exact; }
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+  }
 }

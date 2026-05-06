@@ -165,12 +165,12 @@
 <script>
 // Dashboard specific logic
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!cvApp.getAccessToken()) {
+  try {
+    await loadDashboardData();
+  } catch (e) {
+    // Si l'API renvoie 401/erreur auth, redirect
     window.location.href = '/auth/login/?next=/dashboard/';
-    return;
   }
-  
-  await loadDashboardData();
 });
 
 async function loadDashboardData() {
@@ -181,9 +181,13 @@ async function loadDashboardData() {
     const user = await cvApp.apiGet('auth/profile/');
     document.getElementById('dashboard-username').textContent = user.first_name || user.email.split('@')[0];
     
-    // Load stats (analytics)
-    const stats = await cvApp.apiGet('analytics/dashboard-stats/');
-    document.getElementById('total-cvs').textContent = stats.total_cvs || 0;
+    // Load stats (analytics) - Wrapped in try/catch because of Admin-only permissions
+    try {
+      const stats = await cvApp.apiGet('analytics/dashboard-stats/');
+      document.getElementById('total-cvs').textContent = stats.total_cvs || 0;
+    } catch (e) {
+      console.warn("Analytics inaccessible (Admin only)");
+    }
     
     // Load subscription
     const subscription = await cvApp.apiGet('subscriptions/');
@@ -192,7 +196,7 @@ async function loadDashboardData() {
     }
     
     // Load CVs
-    const cvs = await cvApp.apiGet('cvs/');
+    const cvs = await cvApp.apiGet('cv/');
     renderCVsList(cvs);
     
     // Load notifications
@@ -213,7 +217,7 @@ function updateSubscriptionCard(sub) {
   const planExpiresEl = document.getElementById('plan-expires');
   const planIconEl = document.getElementById('plan-icon');
   
-  const status = sub.status.toUpperCase();
+  const status = sub.status ? sub.status.toUpperCase() : 'UNKNOWN'; // Handle potential null status
   const plan = sub.plan;
   
   statusEl.textContent = status;
@@ -282,7 +286,7 @@ async function exportCV(cvId = null) {
   }
   
   const link = document.createElement('a');
-  link.href = `/api/cvs/${cvId}/export-pdf/`;
+  link.href = `/api/cv/${cvId}/export/`;
   link.target = '_blank';
   link.download = `CV-${cvId}.pdf`;
   document.body.appendChild(link);

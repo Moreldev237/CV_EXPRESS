@@ -147,10 +147,8 @@ python manage.py createsuperuser
 # Lancer le backend
 python manage.py runserver
 
-# Frontend local (React + Vite)
-cd frontend
-npm install
-npm run dev
+# Frontend local (html,css, js,tailwindcss)
+html,css, js,tailwindcss
 ```
 
 ### Configuration

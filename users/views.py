@@ -37,7 +37,6 @@ class RegisterView(APIView):
                               "L'e-mail servira d'identifiant unique. "
                               "Un code OTP est envoyé par e-mail pour activer le compte.",
         request_body=RegisterSerializer,
-        consumes=['application/x-www-form-urlencoded'],
         responses={
             201: openapi.Response(
                 description='Utilisateur enregistré avec succès',
@@ -75,7 +74,6 @@ class VerifyRegistrationOTPView(APIView):
         operation_id='Vérifier OTP',
         operation_description='Vérifie le code OTP envoyé par e-mail. Si le code est valide et non expiré, le compte est activé et les tokens JWT sont renvoyés.',
         request_body=OTPVerificationSerializer,
-        consumes=['application/x-www-form-urlencoded'],
         responses={
             200: openapi.Response(
                 description='Compte activé avec succès',
@@ -221,7 +219,6 @@ class UpdateProfileView(APIView):
         operation_id='Mettre à jour le profil',
         operation_description='Met à jour les informations du profil de l\'utilisateur authentifié. Tous les champs sont optionnels.',
         request_body=UpdateProfileSerializer,
-        consumes=['application/x-www-form-urlencoded'],
         responses={
             200: openapi.Response(
                 description='Profil mis à jour avec succès',
